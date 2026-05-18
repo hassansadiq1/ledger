@@ -1,0 +1,2558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Ledger" />
+<meta name="theme-color" content="#EFE9DD" />
+<title>Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..800,0..100;1,9..144,300..800,0..100&family=DM+Sans:opsz,wght@9..40,300..700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #EFE9DD;
+    --surface: #F8F4EB;
+    --surface-2: #E5DDCB;
+    --ink: #1A1612;
+    --ink-2: #6B5F4F;
+    --ink-3: #9B8E7B;
+    --accent: #B5532C;
+    --accent-soft: #E5C9B8;
+    --border: #D9CFB8;
+    --border-soft: #E5DDCB;
+    --positive: #5C7548;
+    --warn: #B8884C;
+    --danger: #A23E2C;
+
+    --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    --r-sm: 8px;
+    --r-md: 14px;
+    --r-lg: 20px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(181, 83, 44, 0.04), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(92, 117, 72, 0.03), transparent 40%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── Header ─────────────────────────────────────── */
+  header {
+    padding: 28px 0 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "opsz" 24;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .brand::first-letter { color: var(--accent); }
+
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .month-nav-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-family: var(--sans);
+    transition: all 0.15s ease;
+  }
+  .month-nav-btn:hover:not(:disabled) {
+    border-color: var(--ink-2);
+    color: var(--ink);
+  }
+  .month-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .month-nav-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-2);
+    font-weight: 500;
+    min-width: 100px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .month-nav-label.viewing-past {
+    color: var(--accent);
+  }
+
+  /* ── Hero total ─────────────────────────────────── */
+  .hero {
+    padding: 8px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .hero-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-2);
+    margin-bottom: 8px;
+  }
+  .hero-amount {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 400;
+    font-size: clamp(40px, 12vw, 64px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+    font-feature-settings: "tnum" 1;
+  }
+  .hero-amount .currency {
+    font-size: 0.45em;
+    color: var(--ink-2);
+    margin-right: 8px;
+    font-style: italic;
+    letter-spacing: 0;
+  }
+  .hero-amount .cents {
+    font-size: 0.55em;
+    color: var(--ink-2);
+  }
+  .hero-amount.over { color: var(--danger); }
+
+  /* Budget progress */
+  .budget {
+    margin-top: 16px;
+  }
+  .budget-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .budget-text {
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .budget-text strong {
+    color: var(--ink);
+    font-weight: 600;
+    font-feature-settings: "tnum" 1;
+  }
+  .budget-text .over-amount { color: var(--danger); font-weight: 600; }
+  .budget-edit-hint {
+    font-size: 11px;
+    color: var(--ink-3);
+    font-family: var(--serif);
+    font-style: italic;
+  }
+  .budget-bar {
+    margin-top: 8px;
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    background: var(--positive);
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s ease;
+    max-width: 100%;
+  }
+  .budget-bar-fill.warn { background: var(--warn); }
+  .budget-bar-fill.over { background: var(--danger); }
+
+  .budget-edit {
+    display: none;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 0;
+  }
+  .budget-edit.active { display: flex; }
+  .budget-display.hidden { display: none; }
+  .budget-edit input {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--r-sm);
+    padding: 8px 10px;
+    font-family: var(--sans);
+    font-size: 14px;
+    outline: none;
+    color: var(--ink);
+    min-width: 0;
+  }
+  .budget-edit input:focus { border-color: var(--accent); }
+  .budget-edit button {
+    background: var(--ink);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: var(--sans);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .budget-edit button.secondary {
+    background: transparent;
+    color: var(--ink-2);
+    border: 1px solid var(--border);
+  }
+
+  .hero-meta {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .hero-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Add card ───────────────────────────────────── */
+  .add-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 18px;
+    margin-bottom: 28px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .add-card.editing {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .add-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .add-card h2 {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .add-card.editing h2 { color: var(--accent); }
+  .cancel-edit {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .cancel-edit:hover { color: var(--accent); }
+
+  .amount-row {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+  .amount-row .cur {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-2);
+    margin-right: 10px;
+  }
+  .amount-row input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 72;
+    font-weight: 400;
+    font-size: 32px;
+    color: var(--ink);
+    padding: 0;
+    outline: none;
+    width: 100%;
+    font-feature-settings: "tnum" 1;
+  }
+  .amount-row input::placeholder { color: var(--ink-3); }
+
+  .chips-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .chips-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .chips-edit-link {
+    background: none;
+    border: none;
+    color: var(--ink-2);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 3px;
+  }
+  .chips-edit-link:hover { color: var(--accent); }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .chip {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: var(--sans);
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dot, var(--ink-3));
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+  }
+  .chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+
+  .note-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .note-row input[type="text"],
+  .note-row input[type="date"] {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--r-sm);
+    padding: 10px 12px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .note-row input[type="text"] {
+    flex: 1;
+    min-width: 0;
+  }
+  .note-row input[type="date"] {
+    width: 140px;
+    color: var(--ink-2);
+  }
+  .note-row input:focus { border-color: var(--accent); }
+
+  .save-btn {
+    width: 100%;
+    background: var(--ink);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--r-md);
+    padding: 14px;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: transform 0.05s ease, background 0.2s ease;
+  }
+  .save-btn:active { transform: scale(0.99); }
+  .save-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .save-btn.editing { background: var(--accent); }
+
+  /* ── Tabs ───────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    background: none;
+    border: none;
+    padding: 10px 2px;
+    margin-right: 20px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink-3);
+    cursor: pointer;
+    position: relative;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  /* ── List view ──────────────────────────────────── */
+  .day-group { margin-bottom: 18px; }
+  .day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+    padding: 0 2px;
+  }
+  .day-label {
+    font-family: var(--serif);
+    font-style: italic;
+    font-variation-settings: "opsz" 14, "SOFT" 100;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .day-total {
+    font-size: 12px;
+    color: var(--ink-3);
+    font-feature-settings: "tnum" 1;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;
+    position: relative;
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot, var(--ink-3));
+    flex-shrink: 0;
+  }
+  .entry-main { min-width: 0; }
+  .entry-note {
+    font-size: 15px;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .entry-cat {
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+  }
+  .entry-amount {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 24;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--ink);
+    font-feature-settings: "tnum" 1;
+  }
+
+  .entry.expanded {
+    background: var(--surface);
+    border-radius: var(--r-sm);
+    border-bottom-color: transparent;
+  }
+  .entry.editing-now { opacity: 0.5; }
+  .entry-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    margin-top: 4px;
+    animation: slideIn 0.18s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .entry-action {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .entry-action.danger {
+    color: var(--accent);
+    border-color: var(--accent-soft);
+  }
+  .entry-action.primary {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+  }
+
+  /* ── Categories view ────────────────────────────── */
+  .cat-row {
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .cat-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .cat-name .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot);
+  }
+  .cat-amount {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 24;
+    font-weight: 500;
+    font-size: 16px;
+    font-feature-settings: "tnum" 1;
+  }
+  .cat-pct {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-left: 6px;
+  }
+  .cat-bar {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .cat-bar-fill {
+    height: 100%;
+    background: var(--dot);
+    border-radius: 999px;
+    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ── Subcategory chips (in add card) ────────────── */
+  .sub-chips-section {
+    margin-top: -4px;
+    margin-bottom: 14px;
+    padding: 12px 12px 10px;
+    background: var(--bg);
+    border-radius: var(--r-sm);
+    border: 1px dashed var(--border);
+    animation: slideIn 0.18s ease;
+  }
+  .sub-chips-section .chips-label {
+    margin-bottom: 8px;
+    display: block;
+  }
+  .sub-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .sub-chip {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-family: var(--sans);
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+  }
+  .sub-chip .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--dot, var(--ink-3));
+  }
+  .sub-chip[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+  }
+  .sub-chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+  .sub-chip.none-chip { font-style: italic; opacity: 0.85; }
+
+  /* ── Sub editor (inside category sheet) ─────────── */
+  .cat-edit-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-subs-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--sans);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+  .cat-subs-toggle:hover { border-color: var(--ink-2); color: var(--ink); }
+  .cat-subs-toggle .chev {
+    font-size: 9px;
+    transition: transform 0.2s ease;
+  }
+  .cat-subs-toggle.open .chev { transform: rotate(90deg); }
+  .cat-subs-toggle .count {
+    font-feature-settings: "tnum" 1;
+    font-weight: 600;
+  }
+
+  .sub-editor {
+    display: none;
+    margin-top: 8px;
+    margin-left: 28px;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+    animation: slideIn 0.18s ease;
+  }
+  .sub-editor.open { display: block; }
+  .sub-editor-label {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    margin: 4px 0 8px;
+  }
+  .sub-edit-row {
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-soft);
+  }
+  .sub-edit-row:last-of-type { border-bottom: none; }
+  .sub-edit-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sub-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--dot);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .sub-name-input {
+    flex: 1;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 4px 6px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    border-radius: var(--r-sm);
+    min-width: 0;
+  }
+  .sub-name-input:focus {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+  .sub-delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 4px 6px;
+    font-size: 15px;
+    font-family: var(--serif);
+    font-style: italic;
+    transition: color 0.15s ease;
+  }
+  .sub-delete-btn:hover { color: var(--danger); }
+  .sub-palette {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px;
+    background: var(--surface);
+    border-radius: var(--r-sm);
+  }
+  .sub-palette.open { display: flex; }
+  .sub-palette .palette-swatch {
+    width: 20px;
+    height: 20px;
+  }
+  .sub-add-btn {
+    width: 100%;
+    margin-top: 8px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--ink-3);
+    border-radius: var(--r-sm);
+    padding: 7px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s ease;
+  }
+  .sub-add-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Focused (drilled-down) category view ─────────── */
+  .focused-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0 16px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .focused-back {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+  .focused-back:hover { border-color: var(--ink-2); color: var(--ink); }
+  .focused-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--serif);
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "opsz" 24;
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--ink);
+  }
+  .focused-title .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot);
+  }
+
+  /* Category row with chevron when drill-down available */
+  .cat-row.drillable { cursor: pointer; }
+  .cat-row.drillable:hover { background: var(--surface); border-radius: var(--r-sm); }
+  .cat-row .drill-arrow {
+    color: var(--ink-3);
+    margin-left: 6px;
+    font-family: var(--serif);
+    font-style: italic;
+  }
+
+  /* ── Donut chart ────────────────────────────────── */
+  .donut-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 12px 0 24px;
+    margin-bottom: 8px;
+  }
+  .donut {
+    width: 220px;
+    height: 220px;
+    overflow: visible;
+    animation: donutIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes donutIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .donut-seg {
+    transition: stroke-width 0.2s ease;
+  }
+  .donut-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    fill: var(--ink-2);
+    pointer-events: none;
+  }
+  .donut-label-dot {
+    font-size: 14px;
+  }
+  .donut-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    line-height: 1.15;
+  }
+  .donut-total {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 36, "SOFT" 50;
+    font-weight: 500;
+    font-size: 24px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    font-feature-settings: "tnum" 1;
+  }
+  .donut-total .currency {
+    font-size: 0.55em;
+    color: var(--ink-2);
+    font-style: italic;
+    margin-right: 3px;
+  }
+
+  /* ── Empty state ────────────────────────────────── */
+  .empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--ink-3);
+  }
+  .empty-mark {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 36px;
+    color: var(--accent);
+    opacity: 0.6;
+    margin-bottom: 10px;
+  }
+  .empty-text {
+    font-size: 14px;
+    max-width: 240px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Footer ─────────────────────────────────────── */
+  .data-bar {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .data-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    border-radius: var(--r-sm);
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s ease;
+  }
+  .data-btn:hover { border-color: var(--ink-2); color: var(--ink); }
+
+  .footnote {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 16px;
+    font-family: var(--serif);
+    font-style: italic;
+  }
+
+  /* ── Toast ──────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--surface);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-family: var(--sans);
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 200;
+    box-shadow: 0 8px 20px rgba(26, 22, 18, 0.15);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── Sheet (modal) ──────────────────────────────── */
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 22, 18, 0.35);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+  .sheet-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .sheet {
+    background: var(--bg);
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 -10px 40px rgba(26, 22, 18, 0.1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .sheet-header {
+    padding: 20px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "opsz" 24;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .sheet-close {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .sheet-body {
+    padding: 12px 20px 24px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Category editor rows */
+  .cat-edit-row {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .cat-edit-row:last-of-type { border-bottom: none; }
+  .cat-edit-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cat-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--dot);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .cat-swatch:hover { transform: scale(1.1); }
+  .cat-name-input {
+    flex: 1;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 6px 8px;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    border-radius: var(--r-sm);
+    min-width: 0;
+  }
+  .cat-name-input:focus {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+  .cat-delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 6px 8px;
+    font-size: 18px;
+    font-family: var(--serif);
+    font-style: italic;
+    transition: color 0.15s ease;
+  }
+  .cat-delete-btn:hover { color: var(--danger); }
+
+  .palette {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--surface);
+    border-radius: var(--r-sm);
+  }
+  .palette.open { display: flex; }
+  .palette-swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.1s ease;
+  }
+  .palette-swatch:hover { transform: scale(1.15); }
+  .palette-swatch.selected { border-color: var(--ink); }
+
+  .cat-add-btn {
+    width: 100%;
+    margin-top: 16px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--ink-2);
+    border-radius: var(--r-md);
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s ease;
+  }
+  .cat-add-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  @media (max-width: 380px) {
+    .app { padding: 0 16px 80px; }
+    .note-row { flex-direction: column; }
+    .note-row input[type="date"] { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand">Ledger</div>
+    <div class="month-nav">
+      <button class="month-nav-btn" id="month-prev" aria-label="Previous month">‹</button>
+      <div class="month-nav-label" id="month-label">—</div>
+      <button class="month-nav-btn" id="month-next" aria-label="Next month">›</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-label" id="hero-label">This month</div>
+    <div class="hero-amount" id="hero-amount">
+      <span class="currency">Rs</span><span id="hero-whole">0</span><span class="cents" id="hero-cents"></span>
+    </div>
+
+    <div class="budget">
+      <div class="budget-display" id="budget-display">
+        <span class="budget-text" id="budget-text">No budget set</span>
+        <span class="budget-edit-hint">tap to edit</span>
+      </div>
+      <div class="budget-edit" id="budget-edit">
+        <input id="budget-input" type="text" inputmode="numeric" placeholder="Monthly budget (Rs)" />
+        <button id="budget-save">Save</button>
+        <button id="budget-cancel" class="secondary">Cancel</button>
+      </div>
+      <div class="budget-bar" id="budget-bar" hidden>
+        <div class="budget-bar-fill" id="budget-bar-fill"></div>
+      </div>
+    </div>
+
+    <div class="hero-meta" id="hero-meta">No expenses yet</div>
+  </section>
+
+  <section class="add-card" id="add-card">
+    <div class="add-card-header">
+      <h2 id="add-card-title">New entry</h2>
+      <button class="cancel-edit" id="cancel-edit" hidden>Cancel</button>
+    </div>
+
+    <div class="amount-row">
+      <span class="cur">Rs</span>
+      <input id="in-amount" type="text" inputmode="decimal" placeholder="0" autocomplete="off" />
+    </div>
+
+    <div class="chips-row">
+      <span class="chips-label">Category</span>
+      <button class="chips-edit-link" id="open-cat-editor">Edit categories</button>
+    </div>
+    <div class="chips" id="cat-chips"></div>
+
+    <div class="sub-chips-section" id="sub-chips-section" hidden>
+      <span class="chips-label">Subcategory</span>
+      <div class="sub-chips" id="sub-chips"></div>
+    </div>
+
+    <div class="note-row">
+      <input id="in-note" type="text" placeholder="Note (optional)" autocomplete="off" />
+      <input id="in-date" type="date" />
+    </div>
+
+    <button class="save-btn" id="save-btn" disabled>Add to ledger</button>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-view="recent">Recent</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="categories">By category</button>
+  </nav>
+
+  <section id="view-recent"></section>
+  <section id="view-categories" hidden></section>
+
+  <div class="data-bar">
+    <button class="data-btn" id="btn-export">Export backup</button>
+    <button class="data-btn" id="btn-import">Import backup</button>
+    <input type="file" id="file-input" accept="application/json" hidden />
+  </div>
+
+  <div class="footnote">Your data lives on this device.</div>
+
+</div>
+
+<!-- Category editor sheet -->
+<div class="sheet-backdrop" id="cat-sheet-backdrop">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-header">
+      <div class="sheet-title">Categories</div>
+      <button class="sheet-close" id="cat-sheet-close" aria-label="Close">×</button>
+    </div>
+    <div class="sheet-body" id="cat-sheet-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───────────────────────────────────────────────────────────
+   Storage adapter — works in both Claude artifacts (where
+   window.storage is provided) and in self-hosted deployments
+   (falls back to localStorage). Same code, no changes needed.
+   ─────────────────────────────────────────────────────────── */
+const ENTRIES_KEY = "ledger:entries:v1";
+const SETTINGS_KEY = "ledger:settings:v1";
+
+const store = {
+  hasWindowStorage() {
+    return typeof window !== "undefined"
+      && window.storage
+      && typeof window.storage.get === "function";
+  },
+  async loadKey(key, fallback) {
+    try {
+      if (this.hasWindowStorage()) {
+        const r = await window.storage.get(key);
+        return r && r.value ? JSON.parse(r.value) : fallback;
+      }
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      console.warn("Load failed for", key, e);
+      return fallback;
+    }
+  },
+  async saveKey(key, value) {
+    const payload = JSON.stringify(value);
+    try {
+      if (this.hasWindowStorage()) {
+        await window.storage.set(key, payload);
+      } else {
+        localStorage.setItem(key, payload);
+      }
+    } catch (e) {
+      console.error("Save failed for", key, e);
+      toast("Couldn't save — try Export backup");
+    }
+  },
+  loadEntries() { return this.loadKey(ENTRIES_KEY, []); },
+  saveEntries(v) { return this.saveKey(ENTRIES_KEY, v); },
+  loadSettings() { return this.loadKey(SETTINGS_KEY, null); },
+  saveSettings(v) { return this.saveKey(SETTINGS_KEY, v); }
+};
+
+/* ───────────────────────────────────────────────────────────
+   Defaults & palette
+   ─────────────────────────────────────────────────────────── */
+const PALETTE = [
+  "#C56B49", "#6B7B5C", "#8B5A6B", "#5C6B7A",
+  "#B8884C", "#7A5C6B", "#8C8275", "#7D8B47",
+  "#8A4B4F", "#4D6B5A", "#6E8395", "#A98248"
+];
+
+const DEFAULT_CATEGORIES = [
+  { id: "food",          name: "Food",          color: "#C56B49", subcategories: [] },
+  { id: "transport",     name: "Transport",     color: "#6B7B5C", subcategories: [] },
+  { id: "shopping",      name: "Shopping",      color: "#8B5A6B", subcategories: [] },
+  { id: "bills",         name: "Bills",         color: "#5C6B7A", subcategories: [] },
+  { id: "entertainment", name: "Entertainment", color: "#B8884C", subcategories: [] },
+  { id: "health",        name: "Health",        color: "#7A5C6B", subcategories: [] },
+  { id: "other",         name: "Other",         color: "#8C8275", subcategories: [] },
+];
+
+/* ───────────────────────────────────────────────────────────
+   State
+   ─────────────────────────────────────────────────────────── */
+let entries = [];
+let categories = [];
+let budgets = {};           // { "YYYY-MM": number }
+let selectedCat = null;
+let selectedSub = null;     // subcategory id within selectedCat, or null
+let activeView = "recent";
+let expandedId = null;
+let editingId = null;
+let viewMonth = currentMonth();
+let focusedCategory = null;     // category id when drilled into sub-breakdown
+let expandedCatInEditor = null; // category id whose sub-editor is open
+let openPalette = null;         // { type:"cat", catId } | { type:"sub", catId, subId } | null
+
+/* ───────────────────────────────────────────────────────────
+   Utilities
+   ─────────────────────────────────────────────────────────── */
+function ymd(d) {
+  const dt = (d instanceof Date) ? d : new Date(d);
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, "0");
+  const da = String(dt.getDate()).padStart(2, "0");
+  return `${y}-${m}-${da}`;
+}
+function todayYMD() { return ymd(new Date()); }
+function monthOf(dateStr) { return dateStr.slice(0, 7); }
+function currentMonth() { return todayYMD().slice(0, 7); }
+
+function monthLabel(yyyymm) {
+  const [y, m] = yyyymm.split("-").map(Number);
+  const d = new Date(y, m - 1, 1);
+  return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+function monthLabelShort(yyyymm) {
+  const [y, m] = yyyymm.split("-").map(Number);
+  const d = new Date(y, m - 1, 1);
+  return d.toLocaleDateString(undefined, { month: "short", year: "numeric" });
+}
+
+function shiftMonth(yyyymm, delta) {
+  const [y, m] = yyyymm.split("-").map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return ymd(d).slice(0, 7);
+}
+
+function prettyDayLabel(dateStr) {
+  const today = todayYMD();
+  const d = new Date(dateStr + "T00:00:00");
+  const t = new Date(today + "T00:00:00");
+  const diff = Math.round((t - d) / (1000 * 60 * 60 * 24));
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Yesterday";
+  if (diff > 1 && diff < 7) return d.toLocaleDateString(undefined, { weekday: "long" });
+  return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function formatNumber(n) {
+  // Show no decimals if whole, otherwise show up to 2
+  const rounded = Math.round(n * 100) / 100;
+  if (rounded % 1 === 0) {
+    return Math.round(rounded).toLocaleString("en-US");
+  }
+  return rounded.toFixed(2).replace(/\B(?=(\d{3})+\.)/g, ",");
+}
+
+function fmtMoney(n) {
+  return "Rs " + formatNumber(n);
+}
+
+function catById(id) {
+  return categories.find(c => c.id === id)
+      || categories[categories.length - 1]
+      || { id: "other", name: "Other", color: "#8C8275", subcategories: [] };
+}
+
+function subById(catId, subId) {
+  if (!subId) return null;
+  const cat = categories.find(c => c.id === catId);
+  if (!cat || !Array.isArray(cat.subcategories)) return null;
+  return cat.subcategories.find(s => s.id === subId) || null;
+}
+
+function ensureSubArrays() {
+  categories.forEach(c => {
+    if (!Array.isArray(c.subcategories)) c.subcategories = [];
+  });
+}
+
+function budgetFor(month) {
+  return budgets[month] || 0;
+}
+
+function suggestedBudget(month) {
+  // Most recent prior month's budget — used as smart default when
+  // setting a brand-new month's budget.
+  const priors = Object.keys(budgets).filter(m => m < month).sort();
+  return priors.length ? budgets[priors[priors.length - 1]] : 0;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/* ───────────────────────────────────────────────────────────
+   Persistence helpers
+   ─────────────────────────────────────────────────────────── */
+async function persistSettings() {
+  await store.saveSettings({ categories, budgets });
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — header + month nav
+   ─────────────────────────────────────────────────────────── */
+function renderMonthNav() {
+  document.getElementById("month-label").textContent = monthLabelShort(viewMonth);
+
+  const isCurrent = viewMonth === currentMonth();
+  const labelEl = document.getElementById("month-label");
+  labelEl.classList.toggle("viewing-past", !isCurrent);
+
+  // Disable next button if at/beyond current month
+  document.getElementById("month-next").disabled = isCurrent;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — hero + budget
+   ─────────────────────────────────────────────────────────── */
+function renderHero() {
+  const monthEntries = entries.filter(e => monthOf(e.date) === viewMonth);
+  const total = monthEntries.reduce((s, e) => s + e.amount, 0);
+
+  // Format the big amount
+  const rounded = Math.round(total * 100) / 100;
+  const wholePart = Math.floor(rounded);
+  const centsPart = Math.round((rounded - wholePart) * 100);
+
+  document.getElementById("hero-whole").textContent =
+    wholePart.toLocaleString("en-US");
+  document.getElementById("hero-cents").textContent =
+    centsPart > 0 ? "." + String(centsPart).padStart(2, "0") : "";
+
+  // Hero label changes based on viewing current vs past month
+  const isCurrent = viewMonth === currentMonth();
+  document.getElementById("hero-label").textContent =
+    isCurrent ? "This month" : monthLabel(viewMonth);
+
+  // Mark hero red if over budget
+  const heroEl = document.getElementById("hero-amount");
+  const budget = budgetFor(viewMonth);
+  const isOver = budget > 0 && total > budget;
+  heroEl.classList.toggle("over", isOver);
+
+  // Meta
+  const meta = document.getElementById("hero-meta");
+  if (monthEntries.length === 0) {
+    meta.textContent = isCurrent
+      ? "No expenses logged this month."
+      : "No entries for this month.";
+  } else {
+    const count = monthEntries.length;
+    const days = new Set(monthEntries.map(e => e.date)).size;
+    meta.innerHTML = `<strong>${count}</strong> ${count === 1 ? "entry" : "entries"} across <strong>${days}</strong> ${days === 1 ? "day" : "days"}.`;
+  }
+
+  renderBudget(total);
+}
+
+function renderBudget(monthTotal) {
+  const display = document.getElementById("budget-display");
+  const text = document.getElementById("budget-text");
+  const bar = document.getElementById("budget-bar");
+  const fill = document.getElementById("budget-bar-fill");
+
+  const budget = budgetFor(viewMonth);
+
+  if (budget <= 0) {
+    text.textContent = "Set a budget for this month";
+    bar.hidden = true;
+    return;
+  }
+
+  bar.hidden = false;
+  const pct = (monthTotal / budget) * 100;
+  const visualPct = Math.min(pct, 100);
+  fill.style.width = visualPct + "%";
+
+  // Color states
+  fill.classList.remove("warn", "over");
+  if (pct >= 100) fill.classList.add("over");
+  else if (pct >= 80) fill.classList.add("warn");
+
+  // Text
+  if (pct >= 100) {
+    const over = monthTotal - budget;
+    text.innerHTML = `<strong>${fmtMoney(monthTotal)}</strong> of ${fmtMoney(budget)} · <span class="over-amount">${fmtMoney(over)} over</span>`;
+  } else {
+    const remaining = budget - monthTotal;
+    text.innerHTML = `<strong>${fmtMoney(monthTotal)}</strong> of ${fmtMoney(budget)} · ${fmtMoney(remaining)} left`;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — category chips on add card
+   ─────────────────────────────────────────────────────────── */
+function renderChips() {
+  const root = document.getElementById("cat-chips");
+  root.innerHTML = "";
+
+  // Make sure selectedCat is valid
+  if (!categories.find(c => c.id === selectedCat)) {
+    selectedCat = categories[0] ? categories[0].id : null;
+    selectedSub = null;
+  }
+
+  categories.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.setAttribute("aria-pressed", c.id === selectedCat ? "true" : "false");
+    b.style.setProperty("--dot", c.color);
+    b.innerHTML = `<span class="dot"></span>${escapeHtml(c.name)}`;
+    b.addEventListener("click", () => {
+      if (selectedCat !== c.id) {
+        selectedCat = c.id;
+        selectedSub = null; // reset on category change
+      }
+      renderChips();
+    });
+    root.appendChild(b);
+  });
+
+  renderSubChips();
+}
+
+function renderSubChips() {
+  const section = document.getElementById("sub-chips-section");
+  const root = document.getElementById("sub-chips");
+  const cat = categories.find(c => c.id === selectedCat);
+  const subs = (cat && Array.isArray(cat.subcategories)) ? cat.subcategories : [];
+
+  if (subs.length === 0) {
+    section.hidden = true;
+    root.innerHTML = "";
+    selectedSub = null;
+    return;
+  }
+
+  // Make sure selectedSub is valid for this cat
+  if (selectedSub && !subs.find(s => s.id === selectedSub)) {
+    selectedSub = null;
+  }
+
+  section.hidden = false;
+  root.innerHTML = "";
+
+  // "None" chip — explicit way to log without a subcategory
+  const noneBtn = document.createElement("button");
+  noneBtn.className = "sub-chip none-chip";
+  noneBtn.setAttribute("aria-pressed", selectedSub === null ? "true" : "false");
+  noneBtn.textContent = "None";
+  noneBtn.addEventListener("click", () => {
+    selectedSub = null;
+    renderSubChips();
+  });
+  root.appendChild(noneBtn);
+
+  subs.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "sub-chip";
+    b.setAttribute("aria-pressed", s.id === selectedSub ? "true" : "false");
+    b.style.setProperty("--dot", s.color);
+    b.innerHTML = `<span class="dot"></span>${escapeHtml(s.name)}`;
+    b.addEventListener("click", () => {
+      selectedSub = s.id;
+      renderSubChips();
+    });
+    root.appendChild(b);
+  });
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — recent view
+   ─────────────────────────────────────────────────────────── */
+function renderRecent() {
+  const root = document.getElementById("view-recent");
+  const monthEntries = entries.filter(e => monthOf(e.date) === viewMonth);
+
+  if (monthEntries.length === 0) {
+    root.innerHTML = `
+      <div class="empty">
+        <div class="empty-mark">⁂</div>
+        <div class="empty-text">${viewMonth === currentMonth()
+          ? "Your ledger is empty. Add your first entry above to begin keeping track."
+          : "No entries for this month."}</div>
+      </div>`;
+    return;
+  }
+
+  const sorted = [...monthEntries].sort((a, b) => {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return b.createdAt - a.createdAt;
+  });
+
+  const groups = {};
+  sorted.forEach(e => {
+    if (!groups[e.date]) groups[e.date] = [];
+    groups[e.date].push(e);
+  });
+
+  const html = Object.keys(groups).map(date => {
+    const day = groups[date];
+    const dayTotal = day.reduce((s, e) => s + e.amount, 0);
+    const rows = day.map(e => {
+      const cat = catById(e.category);
+      const sub = subById(e.category, e.subcategory);
+      const isOpen = e.id === expandedId;
+      const isEditing = e.id === editingId;
+      const catLabel = sub
+        ? `${escapeHtml(cat.name)} · ${escapeHtml(sub.name)}`
+        : escapeHtml(cat.name);
+      // If no note, fall back to subcategory name first, then category name as italic placeholder
+      const noteFallback = sub ? escapeHtml(sub.name) : escapeHtml(cat.name);
+      return `
+        <div class="entry ${isOpen ? "expanded" : ""} ${isEditing ? "editing-now" : ""}" data-id="${e.id}" style="--dot:${cat.color};">
+          <span class="entry-dot"></span>
+          <div class="entry-main">
+            <div class="entry-note">${e.note ? escapeHtml(e.note) : `<span style="color:var(--ink-3);font-style:italic">${noteFallback}</span>`}</div>
+            <div class="entry-cat">${catLabel}</div>
+          </div>
+          <div class="entry-amount">${fmtMoney(e.amount)}</div>
+          ${isOpen ? `
+            <div class="entry-actions">
+              <button class="entry-action primary" data-action="edit" data-id="${e.id}">Edit</button>
+              <button class="entry-action danger" data-action="delete" data-id="${e.id}">Delete</button>
+              <button class="entry-action" data-action="close">Close</button>
+            </div>` : ""}
+        </div>`;
+    }).join("");
+
+    return `
+      <div class="day-group">
+        <div class="day-header">
+          <span class="day-label">${prettyDayLabel(date)}</span>
+          <span class="day-total">${fmtMoney(dayTotal)}</span>
+        </div>
+        ${rows}
+      </div>`;
+  }).join("");
+
+  root.innerHTML = html;
+
+  root.querySelectorAll(".entry").forEach(el => {
+    el.addEventListener("click", (ev) => {
+      const action = ev.target.dataset.action;
+      const id = ev.target.dataset.id || el.dataset.id;
+      if (action === "delete") { deleteEntry(id); }
+      else if (action === "edit") { startEditEntry(id); }
+      else if (action === "close") { expandedId = null; renderRecent(); }
+      else { expandedId = (expandedId === id) ? null : id; renderRecent(); }
+    });
+  });
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — categories view (spending breakdown)
+   ─────────────────────────────────────────────────────────── */
+function renderCategoriesView() {
+  const root = document.getElementById("view-categories");
+  const monthEntries = entries.filter(e => monthOf(e.date) === viewMonth);
+
+  // Empty?
+  if (monthEntries.length === 0) {
+    root.innerHTML = `
+      <div class="empty">
+        <div class="empty-mark">⁂</div>
+        <div class="empty-text">No spending data for this month yet.</div>
+      </div>`;
+    return;
+  }
+
+  // If we're focused on a specific category, render the sub-breakdown view
+  if (focusedCategory) {
+    renderFocusedView(root, monthEntries);
+    return;
+  }
+
+  // Main top-level breakdown
+  renderTopLevelView(root, monthEntries);
+}
+
+function renderTopLevelView(root, monthEntries) {
+  const total = monthEntries.reduce((s, e) => s + e.amount, 0);
+  const byCat = {};
+  monthEntries.forEach(e => {
+    byCat[e.category] = (byCat[e.category] || 0) + e.amount;
+  });
+
+  const rows = categories
+    .map(c => ({ ...c, amount: byCat[c.id] || 0 }))
+    .filter(c => c.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+
+  if (rows.length === 0) {
+    root.innerHTML = `<div class="empty"><div class="empty-text">No category spending.</div></div>`;
+    return;
+  }
+
+  const chartHtml = buildDonutHtml(rows, total, monthEntries.length);
+  const barHtml = rows.map(c => {
+    const pct = ((c.amount / total) * 100).toFixed(0);
+    const barPct = (c.amount / rows[0].amount) * 100;
+    const hasSubs = Array.isArray(c.subcategories) && c.subcategories.length > 0;
+    return `
+      <div class="cat-row ${hasSubs ? "drillable" : ""}" style="--dot:${c.color};" ${hasSubs ? `data-drill-cat="${c.id}"` : ""}>
+        <div class="cat-row-top">
+          <div class="cat-name"><span class="dot"></span>${escapeHtml(c.name)}${hasSubs ? `<span class="drill-arrow">→</span>` : ""}</div>
+          <div>
+            <span class="cat-amount">${fmtMoney(c.amount)}</span>
+            <span class="cat-pct">${pct}%</span>
+          </div>
+        </div>
+        <div class="cat-bar"><div class="cat-bar-fill" style="width:${barPct}%"></div></div>
+      </div>`;
+  }).join("");
+
+  root.innerHTML = chartHtml + barHtml;
+
+  // Wire drill-down clicks
+  root.querySelectorAll("[data-drill-cat]").forEach(el => {
+    el.addEventListener("click", () => {
+      focusedCategory = el.dataset.drillCat;
+      renderCategoriesView();
+    });
+  });
+}
+
+function renderFocusedView(root, monthEntries) {
+  const cat = categories.find(c => c.id === focusedCategory);
+  if (!cat) {
+    focusedCategory = null;
+    renderTopLevelView(root, monthEntries);
+    return;
+  }
+
+  const catEntries = monthEntries.filter(e => e.category === cat.id);
+  const catTotal = catEntries.reduce((s, e) => s + e.amount, 0);
+
+  // Group by subcategory; "(no subcategory)" bucket for entries without one
+  const bySub = {};
+  let unbucketedTotal = 0;
+  catEntries.forEach(e => {
+    if (e.subcategory) {
+      bySub[e.subcategory] = (bySub[e.subcategory] || 0) + e.amount;
+    } else {
+      unbucketedTotal += e.amount;
+    }
+  });
+
+  const subRows = cat.subcategories
+    .map(s => ({ ...s, amount: bySub[s.id] || 0 }))
+    .filter(s => s.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+
+  // Add an "unbucketed" pseudo-row using the parent's color (dimmed)
+  if (unbucketedTotal > 0) {
+    subRows.push({
+      id: "_unbucketed",
+      name: "(no subcategory)",
+      color: cat.color,
+      amount: unbucketedTotal,
+      isUnbucketed: true
+    });
+  }
+
+  const header = `
+    <div class="focused-header">
+      <button class="focused-back" id="focused-back" aria-label="Back to all categories">‹</button>
+      <div class="focused-title" style="--dot:${cat.color};">
+        <span class="dot"></span>${escapeHtml(cat.name)}
+      </div>
+    </div>`;
+
+  if (subRows.length === 0 || catTotal === 0) {
+    root.innerHTML = header + `
+      <div class="empty">
+        <div class="empty-mark">⁂</div>
+        <div class="empty-text">No spending in ${escapeHtml(cat.name)} this month.</div>
+      </div>`;
+    root.querySelector("#focused-back").addEventListener("click", () => {
+      focusedCategory = null;
+      renderCategoriesView();
+    });
+    return;
+  }
+
+  const chartHtml = buildDonutHtml(subRows, catTotal, catEntries.length);
+
+  const maxAmount = subRows[0].amount;
+  const barHtml = subRows.map(s => {
+    const pct = ((s.amount / catTotal) * 100).toFixed(0);
+    const barPct = (s.amount / maxAmount) * 100;
+    const nameHtml = s.isUnbucketed
+      ? `<span style="color:var(--ink-3); font-style:italic">${escapeHtml(s.name)}</span>`
+      : escapeHtml(s.name);
+    return `
+      <div class="cat-row" style="--dot:${s.color}; ${s.isUnbucketed ? 'opacity:0.7;' : ''}">
+        <div class="cat-row-top">
+          <div class="cat-name"><span class="dot"></span>${nameHtml}</div>
+          <div>
+            <span class="cat-amount">${fmtMoney(s.amount)}</span>
+            <span class="cat-pct">${pct}%</span>
+          </div>
+        </div>
+        <div class="cat-bar"><div class="cat-bar-fill" style="width:${barPct}%"></div></div>
+      </div>`;
+  }).join("");
+
+  root.innerHTML = header + chartHtml + barHtml;
+
+  root.querySelector("#focused-back").addEventListener("click", () => {
+    focusedCategory = null;
+    renderCategoriesView();
+  });
+}
+
+function buildDonutHtml(rows, total, entryCount) {
+  const R = 90;
+  const C = 2 * Math.PI * R;
+  const STROKE = 28;
+  const CX = 120, CY = 120;
+  const LABEL_R = 116; // just outside the outer edge of the ring
+
+  let offset = 0;
+  let cumFrac = 0;
+  const segments = [];
+  const labels = [];
+
+  rows.forEach(c => {
+    const frac = c.amount / total;
+    const seg = frac * C;
+
+    // Donut segment (arc)
+    segments.push(`<circle class="donut-seg" cx="${CX}" cy="${CY}" r="${R}"
+        fill="none" stroke="${c.color}" stroke-width="${STROKE}"
+        stroke-dasharray="${seg.toFixed(2)} ${(C - seg).toFixed(2)}"
+        stroke-dashoffset="${(-offset).toFixed(2)}"
+        transform="rotate(-90 ${CX} ${CY})"><title>${escapeHtml(c.name)}: ${fmtMoney(c.amount)}</title></circle>`);
+
+    offset += seg;
+
+    // Label at midpoint of this slice (skip if the slice is too tiny to read)
+    if (frac >= 0.025) {
+      const midFrac = cumFrac + frac / 2;
+      const ang = midFrac * 2 * Math.PI; // 0 = top, clockwise
+      const x = CX + LABEL_R * Math.sin(ang);
+      const y = CY - LABEL_R * Math.cos(ang);
+
+      let anchor = "middle";
+      if (x > CX + 6) anchor = "start";
+      else if (x < CX - 6) anchor = "end";
+
+      // Truncate long names so they don't crash into the edge
+      const displayName = c.name.length > 12 ? c.name.slice(0, 11) + "…" : c.name;
+
+      labels.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}"
+          text-anchor="${anchor}" dominant-baseline="middle"
+          class="donut-label"><tspan class="donut-label-dot" fill="${c.color}">●</tspan><tspan dx="3">${escapeHtml(displayName)}</tspan></text>`);
+    }
+    cumFrac += frac;
+  });
+
+  const totalRounded = Math.round(total * 100) / 100;
+  const wholePart = Math.floor(totalRounded);
+  const centsPart = Math.round((totalRounded - wholePart) * 100);
+  const centsHtml = centsPart > 0 ? `.${String(centsPart).padStart(2, "0")}` : "";
+
+  return `
+    <div class="donut-wrap">
+      <svg class="donut" viewBox="0 0 240 240" aria-label="Spending breakdown">
+        <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="${STROKE}" />
+        ${segments.join("")}
+        ${labels.join("")}
+      </svg>
+      <div class="donut-center">
+        <div class="donut-total"><span class="currency">Rs</span>${wholePart.toLocaleString("en-US")}${centsHtml}</div>
+      </div>
+    </div>`;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — category editor sheet
+   ─────────────────────────────────────────────────────────── */
+function renderCatEditor() {
+  const root = document.getElementById("cat-sheet-body");
+
+  const rows = categories.map(c => {
+    const isPaletteOpen = openPalette && openPalette.type === "cat" && openPalette.catId === c.id;
+    const isSubOpen = expandedCatInEditor === c.id;
+    const subs = Array.isArray(c.subcategories) ? c.subcategories : [];
+
+    const subRows = subs.map(s => {
+      const isSubPaletteOpen = openPalette && openPalette.type === "sub"
+        && openPalette.catId === c.id && openPalette.subId === s.id;
+      return `
+        <div class="sub-edit-row" data-cat-id="${c.id}" data-sub-id="${s.id}">
+          <div class="sub-edit-main">
+            <div class="sub-swatch" data-action="toggle-sub-palette" data-cat-id="${c.id}" data-sub-id="${s.id}" style="--dot:${s.color};"></div>
+            <input class="sub-name-input" data-cat-id="${c.id}" data-sub-id="${s.id}" type="text" value="${escapeHtml(s.name)}" maxlength="30" />
+            <button class="sub-delete-btn" data-action="delete-sub" data-cat-id="${c.id}" data-sub-id="${s.id}" aria-label="Delete subcategory">×</button>
+          </div>
+          <div class="sub-palette ${isSubPaletteOpen ? "open" : ""}" data-cat-id="${c.id}" data-sub-id="${s.id}">
+            ${PALETTE.map(col => `
+              <div class="palette-swatch ${col.toLowerCase() === s.color.toLowerCase() ? "selected" : ""}"
+                   data-action="pick-sub-color" data-cat-id="${c.id}" data-sub-id="${s.id}" data-color="${col}"
+                   style="background:${col};"></div>
+            `).join("")}
+          </div>
+        </div>`;
+    }).join("");
+
+    return `
+      <div class="cat-edit-row" data-cat-id="${c.id}">
+        <div class="cat-edit-main">
+          <div class="cat-swatch" data-action="toggle-palette" data-cat-id="${c.id}" style="--dot:${c.color};"></div>
+          <input class="cat-name-input" data-cat-id="${c.id}" type="text" value="${escapeHtml(c.name)}" maxlength="30" />
+          <button class="cat-subs-toggle ${isSubOpen ? "open" : ""}" data-action="toggle-subs" data-cat-id="${c.id}" aria-label="Toggle subcategories">
+            <span class="count">${subs.length}</span>
+            <span class="chev">▸</span>
+          </button>
+          ${categories.length > 1 ? `<button class="cat-delete-btn" data-action="delete-cat" data-cat-id="${c.id}" aria-label="Delete category">×</button>` : ""}
+        </div>
+        <div class="palette ${isPaletteOpen ? "open" : ""}" data-cat-id="${c.id}">
+          ${PALETTE.map(col => `
+            <div class="palette-swatch ${col.toLowerCase() === c.color.toLowerCase() ? "selected" : ""}"
+                 data-action="pick-color" data-cat-id="${c.id}" data-color="${col}"
+                 style="background:${col};"></div>
+          `).join("")}
+        </div>
+        <div class="sub-editor ${isSubOpen ? "open" : ""}" data-cat-id="${c.id}">
+          <div class="sub-editor-label">Subcategories of ${escapeHtml(c.name)}</div>
+          ${subRows}
+          <button class="sub-add-btn" data-action="add-sub" data-cat-id="${c.id}">+ Add subcategory</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  root.innerHTML = rows + `<button class="cat-add-btn" id="cat-add-btn">+ Add category</button>`;
+
+  // ── Wire interactions ──
+  root.querySelectorAll(".cat-name-input").forEach(input => {
+    input.addEventListener("blur", () => {
+      const id = input.dataset.catId;
+      const newName = input.value.trim();
+      if (newName) renameCategory(id, newName);
+      else input.value = catById(id).name;
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+  });
+
+  root.querySelectorAll(".sub-name-input").forEach(input => {
+    input.addEventListener("blur", () => {
+      const catId = input.dataset.catId;
+      const subId = input.dataset.subId;
+      const sub = subById(catId, subId);
+      const newName = input.value.trim();
+      if (newName) renameSubcategory(catId, subId, newName);
+      else if (sub) input.value = sub.name;
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+  });
+
+  root.querySelectorAll("[data-action='toggle-palette']").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.catId;
+      const isOpen = openPalette && openPalette.type === "cat" && openPalette.catId === id;
+      openPalette = isOpen ? null : { type: "cat", catId: id };
+      renderCatEditor();
+    });
+  });
+
+  root.querySelectorAll("[data-action='pick-color']").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.catId;
+      const color = el.dataset.color;
+      recolorCategory(id, color);
+      openPalette = null;
+      renderCatEditor();
+    });
+  });
+
+  root.querySelectorAll("[data-action='delete-cat']").forEach(el => {
+    el.addEventListener("click", () => deleteCategory(el.dataset.catId));
+  });
+
+  root.querySelectorAll("[data-action='toggle-subs']").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.catId;
+      expandedCatInEditor = (expandedCatInEditor === id) ? null : id;
+      renderCatEditor();
+    });
+  });
+
+  root.querySelectorAll("[data-action='add-sub']").forEach(el => {
+    el.addEventListener("click", () => addSubcategory(el.dataset.catId));
+  });
+
+  root.querySelectorAll("[data-action='toggle-sub-palette']").forEach(el => {
+    el.addEventListener("click", () => {
+      const { catId, subId } = el.dataset;
+      const isOpen = openPalette && openPalette.type === "sub"
+        && openPalette.catId === catId && openPalette.subId === subId;
+      openPalette = isOpen ? null : { type: "sub", catId, subId };
+      renderCatEditor();
+    });
+  });
+
+  root.querySelectorAll("[data-action='pick-sub-color']").forEach(el => {
+    el.addEventListener("click", () => {
+      const { catId, subId, color } = el.dataset;
+      recolorSubcategory(catId, subId, color);
+      openPalette = null;
+      renderCatEditor();
+    });
+  });
+
+  root.querySelectorAll("[data-action='delete-sub']").forEach(el => {
+    el.addEventListener("click", () => {
+      const { catId, subId } = el.dataset;
+      deleteSubcategory(catId, subId);
+    });
+  });
+
+  document.getElementById("cat-add-btn").addEventListener("click", addCategory);
+}
+
+/* ───────────────────────────────────────────────────────────
+   Mutations — entries
+   ─────────────────────────────────────────────────────────── */
+async function addEntry(amount, category, subcategory, note, date) {
+  entries.push({
+    id: uid(), amount, category,
+    subcategory: subcategory || null,
+    note: note.trim(), date,
+    createdAt: Date.now()
+  });
+  await store.saveEntries(entries);
+  renderAll();
+}
+
+async function updateEntry(id, amount, category, subcategory, note, date) {
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  entries[idx] = {
+    ...entries[idx],
+    amount, category,
+    subcategory: subcategory || null,
+    note: note.trim(), date,
+    updatedAt: Date.now()
+  };
+  await store.saveEntries(entries);
+}
+
+async function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  if (editingId === id) cancelEditMode();
+  expandedId = null;
+  await store.saveEntries(entries);
+  renderAll();
+  toast("Entry removed");
+}
+
+function startEditEntry(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+
+  editingId = id;
+  expandedId = null;
+  selectedCat = e.category;
+  selectedSub = e.subcategory || null;
+
+  document.getElementById("in-amount").value = String(e.amount);
+  document.getElementById("in-note").value = e.note;
+  document.getElementById("in-date").value = e.date;
+
+  document.getElementById("add-card").classList.add("editing");
+  document.getElementById("add-card-title").textContent = "Editing entry";
+  document.getElementById("cancel-edit").hidden = false;
+  document.getElementById("save-btn").classList.add("editing");
+  document.getElementById("save-btn").textContent = "Save changes";
+  document.getElementById("save-btn").disabled = false;
+
+  renderChips();
+  renderRecent();
+
+  // Scroll to the add card so user sees the form
+  document.getElementById("add-card").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function cancelEditMode() {
+  editingId = null;
+  document.getElementById("add-card").classList.remove("editing");
+  document.getElementById("add-card-title").textContent = "New entry";
+  document.getElementById("cancel-edit").hidden = true;
+  document.getElementById("save-btn").classList.remove("editing");
+  document.getElementById("save-btn").textContent = "Add to ledger";
+  document.getElementById("save-btn").disabled = true;
+  document.getElementById("in-amount").value = "";
+  document.getElementById("in-note").value = "";
+  document.getElementById("in-date").value = todayYMD();
+  renderRecent();
+}
+
+/* ───────────────────────────────────────────────────────────
+   Mutations — categories
+   ─────────────────────────────────────────────────────────── */
+async function renameCategory(id, newName) {
+  const cat = categories.find(c => c.id === id);
+  if (!cat || cat.name === newName) return;
+  cat.name = newName;
+  await persistSettings();
+  renderChips();
+  renderCategoriesView();
+}
+
+async function recolorCategory(id, color) {
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+  cat.color = color;
+  await persistSettings();
+  renderChips();
+  renderCategoriesView();
+  renderRecent();
+}
+
+async function deleteCategory(id) {
+  if (categories.length <= 1) {
+    toast("Need at least one category");
+    return;
+  }
+  const cat = categories.find(c => c.id === id);
+  if (!cat) return;
+
+  const used = entries.filter(e => e.category === id).length;
+  const subCount = Array.isArray(cat.subcategories) ? cat.subcategories.length : 0;
+  let confirmMsg = `Delete "${cat.name}"?`;
+  const bits = [];
+  if (used > 0) {
+    const fallback = categories.find(c => c.id !== id);
+    bits.push(`${used} ${used === 1 ? "entry" : "entries"} will move to "${fallback.name}"`);
+  }
+  if (subCount > 0) {
+    bits.push(`${subCount} ${subCount === 1 ? "subcategory" : "subcategories"} will be removed`);
+  }
+  if (bits.length) confirmMsg = `Delete "${cat.name}"? ${bits.join(", ")}.`;
+  if (!confirm(confirmMsg)) return;
+
+  const fallback = categories.find(c => c.id !== id);
+  entries.forEach(e => {
+    if (e.category === id) {
+      e.category = fallback.id;
+      e.subcategory = null; // sub of old cat is no longer valid
+    }
+  });
+
+  categories = categories.filter(c => c.id !== id);
+  if (selectedCat === id) { selectedCat = categories[0].id; selectedSub = null; }
+  if (focusedCategory === id) focusedCategory = null;
+
+  await persistSettings();
+  await store.saveEntries(entries);
+
+  openPalette = null;
+  expandedCatInEditor = null;
+  renderCatEditor();
+  renderAll();
+  toast("Category removed");
+}
+
+async function addCategory() {
+  // Find unused color from palette
+  const usedColors = new Set(categories.map(c => c.color.toLowerCase()));
+  const freeColor = PALETTE.find(p => !usedColors.has(p.toLowerCase())) || PALETTE[0];
+
+  const newCat = {
+    id: uid(),
+    name: "New category",
+    color: freeColor,
+    subcategories: []
+  };
+  categories.push(newCat);
+  await persistSettings();
+  renderCatEditor();
+  renderChips();
+
+  // Focus the new name input for immediate editing
+  setTimeout(() => {
+    const input = document.querySelector(`.cat-name-input[data-cat-id="${newCat.id}"]`);
+    if (input) { input.focus(); input.select(); }
+  }, 50);
+}
+
+/* ── Subcategory CRUD ─────────────────────────────── */
+async function addSubcategory(catId) {
+  const cat = categories.find(c => c.id === catId);
+  if (!cat) return;
+  if (!Array.isArray(cat.subcategories)) cat.subcategories = [];
+
+  // Pick a free-ish color: prefer one not used by parent or existing subs
+  const usedColors = new Set([cat.color.toLowerCase(), ...cat.subcategories.map(s => s.color.toLowerCase())]);
+  const freeColor = PALETTE.find(p => !usedColors.has(p.toLowerCase())) || PALETTE[0];
+
+  const newSub = {
+    id: uid(),
+    name: "New subcategory",
+    color: freeColor
+  };
+  cat.subcategories.push(newSub);
+  expandedCatInEditor = catId; // keep this cat's editor open
+  await persistSettings();
+  renderCatEditor();
+  renderChips();
+
+  setTimeout(() => {
+    const input = document.querySelector(`.sub-name-input[data-cat-id="${catId}"][data-sub-id="${newSub.id}"]`);
+    if (input) { input.focus(); input.select(); }
+  }, 50);
+}
+
+async function renameSubcategory(catId, subId, newName) {
+  const sub = subById(catId, subId);
+  if (!sub || sub.name === newName) return;
+  sub.name = newName;
+  await persistSettings();
+  renderChips();
+  renderCategoriesView();
+}
+
+async function recolorSubcategory(catId, subId, color) {
+  const sub = subById(catId, subId);
+  if (!sub) return;
+  sub.color = color;
+  await persistSettings();
+  renderChips();
+  renderCategoriesView();
+}
+
+async function deleteSubcategory(catId, subId) {
+  const cat = categories.find(c => c.id === catId);
+  const sub = subById(catId, subId);
+  if (!cat || !sub) return;
+
+  const used = entries.filter(e => e.category === catId && e.subcategory === subId).length;
+  const msg = used > 0
+    ? `Delete "${sub.name}"? ${used} ${used === 1 ? "entry" : "entries"} will lose this subcategory but stay under "${cat.name}".`
+    : `Delete "${sub.name}"?`;
+  if (!confirm(msg)) return;
+
+  // Clear subcategory on affected entries
+  entries.forEach(e => {
+    if (e.category === catId && e.subcategory === subId) e.subcategory = null;
+  });
+  cat.subcategories = cat.subcategories.filter(s => s.id !== subId);
+
+  if (selectedCat === catId && selectedSub === subId) selectedSub = null;
+
+  await persistSettings();
+  await store.saveEntries(entries);
+  renderCatEditor();
+  renderAll();
+  toast("Subcategory removed");
+}
+
+/* ───────────────────────────────────────────────────────────
+   Mutations — budget
+   ─────────────────────────────────────────────────────────── */
+async function setBudget(value) {
+  const v = Math.max(0, Math.round(value));
+  if (v === 0) {
+    delete budgets[viewMonth];
+  } else {
+    budgets[viewMonth] = v;
+  }
+  await persistSettings();
+  renderHero();
+  toast(v > 0 ? "Budget updated" : "Budget cleared");
+}
+
+function showBudgetEditor() {
+  const input = document.getElementById("budget-input");
+  // Pre-fill: existing budget for this month, or suggest the most recent prior
+  const current = budgetFor(viewMonth);
+  const prefill = current > 0 ? current : suggestedBudget(viewMonth);
+  input.value = prefill > 0 ? String(prefill) : "";
+  input.placeholder = `Budget for ${monthLabelShort(viewMonth)} (Rs)`;
+  document.getElementById("budget-display").classList.add("hidden");
+  document.getElementById("budget-edit").classList.add("active");
+  setTimeout(() => { input.focus(); input.select(); }, 50);
+}
+
+function hideBudgetEditor() {
+  document.getElementById("budget-display").classList.remove("hidden");
+  document.getElementById("budget-edit").classList.remove("active");
+}
+
+/* ───────────────────────────────────────────────────────────
+   Backup
+   ─────────────────────────────────────────────────────────── */
+function exportBackup() {
+  const payload = {
+    app: "Ledger",
+    version: 3,
+    exportedAt: new Date().toISOString(),
+    data: {
+      entries,
+      categories,
+      budgets
+    }
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ledger-backup-${todayYMD()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast("Backup downloaded");
+}
+
+function importBackup(file) {
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const raw = JSON.parse(e.target.result);
+      const d = (raw && raw.data) ? raw.data : null;
+      if (!d || !Array.isArray(d.entries)) throw new Error("Not a Ledger backup");
+
+      const ok = confirm(`Import ${d.entries.length} entries? This will replace your current ledger and settings.`);
+      if (!ok) return;
+
+      entries = d.entries.map(en => ({
+        id: en.id || uid(),
+        amount: Number(en.amount) || 0,
+        category: en.category || "other",
+        note: en.note || "",
+        date: en.date || todayYMD(),
+        createdAt: en.createdAt || Date.now()
+      }));
+
+      if (Array.isArray(d.categories) && d.categories.length > 0) {
+        categories = d.categories;
+      }
+      budgets = (d.budgets && typeof d.budgets === "object") ? d.budgets : {};
+
+      selectedCat = categories[0].id;
+
+      await store.saveEntries(entries);
+      await persistSettings();
+      renderChips();
+      renderAll();
+      toast(`Imported ${entries.length} entries`);
+    } catch (err) {
+      alert("Couldn't import: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ───────────────────────────────────────────────────────────
+   Toast
+   ─────────────────────────────────────────────────────────── */
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2000);
+}
+
+/* ───────────────────────────────────────────────────────────
+   Render all
+   ─────────────────────────────────────────────────────────── */
+function renderAll() {
+  renderMonthNav();
+  renderHero();
+  renderRecent();
+  renderCategoriesView();
+}
+
+/* ───────────────────────────────────────────────────────────
+   Wiring
+   ─────────────────────────────────────────────────────────── */
+function wire() {
+  document.getElementById("in-date").value = todayYMD();
+
+  const amountEl = document.getElementById("in-amount");
+  const saveBtn = document.getElementById("save-btn");
+
+  amountEl.addEventListener("input", () => {
+    const cleaned = amountEl.value.replace(/[^0-9.]/g, "");
+    if (cleaned !== amountEl.value) amountEl.value = cleaned;
+    const n = parseFloat(cleaned);
+    saveBtn.disabled = !(n > 0);
+  });
+
+  saveBtn.addEventListener("click", async () => {
+    const amount = parseFloat(amountEl.value);
+    if (!(amount > 0)) return;
+    const note = document.getElementById("in-note").value;
+    const date = document.getElementById("in-date").value || todayYMD();
+
+    if (editingId) {
+      await updateEntry(editingId, amount, selectedCat, selectedSub, note, date);
+      cancelEditMode();
+      renderAll();
+      toast("Entry updated");
+    } else {
+      await addEntry(amount, selectedCat, selectedSub, note, date);
+      amountEl.value = "";
+      document.getElementById("in-note").value = "";
+      document.getElementById("in-date").value = todayYMD();
+      saveBtn.disabled = true;
+      toast("Added");
+      amountEl.blur();
+    }
+  });
+
+  document.getElementById("cancel-edit").addEventListener("click", cancelEditMode);
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", () => {
+      activeView = t.dataset.view;
+      document.querySelectorAll(".tab").forEach(x => {
+        x.setAttribute("aria-selected", x === t ? "true" : "false");
+      });
+      document.getElementById("view-recent").hidden = activeView !== "recent";
+      document.getElementById("view-categories").hidden = activeView !== "categories";
+    });
+  });
+
+  // Month navigation
+  document.getElementById("month-prev").addEventListener("click", () => {
+    viewMonth = shiftMonth(viewMonth, -1);
+    expandedId = null;
+    focusedCategory = null;
+    renderAll();
+  });
+  document.getElementById("month-next").addEventListener("click", () => {
+    const next = shiftMonth(viewMonth, 1);
+    // Don't navigate past current month
+    if (next <= currentMonth()) {
+      viewMonth = next;
+      expandedId = null;
+      focusedCategory = null;
+      renderAll();
+    }
+  });
+  // Tap month label to jump back to current
+  document.getElementById("month-label").addEventListener("click", () => {
+    viewMonth = currentMonth();
+    expandedId = null;
+    focusedCategory = null;
+    renderAll();
+  });
+
+  // Budget editor
+  document.getElementById("budget-display").addEventListener("click", showBudgetEditor);
+  document.getElementById("budget-cancel").addEventListener("click", hideBudgetEditor);
+  document.getElementById("budget-save").addEventListener("click", async () => {
+    const v = parseFloat(document.getElementById("budget-input").value);
+    await setBudget(isNaN(v) ? 0 : v);
+    hideBudgetEditor();
+  });
+  document.getElementById("budget-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("budget-save").click();
+    if (e.key === "Escape") hideBudgetEditor();
+  });
+
+  // Category editor sheet
+  document.getElementById("open-cat-editor").addEventListener("click", () => {
+    openPalette = null;
+    expandedCatInEditor = null;
+    renderCatEditor();
+    document.getElementById("cat-sheet-backdrop").classList.add("open");
+  });
+  document.getElementById("cat-sheet-close").addEventListener("click", closeCatSheet);
+  document.getElementById("cat-sheet-backdrop").addEventListener("click", (e) => {
+    if (e.target.id === "cat-sheet-backdrop") closeCatSheet();
+  });
+
+  // Data buttons
+  document.getElementById("btn-export").addEventListener("click", exportBackup);
+  document.getElementById("btn-import").addEventListener("click", () => {
+    document.getElementById("file-input").click();
+  });
+  document.getElementById("file-input").addEventListener("change", (e) => {
+    const f = e.target.files[0];
+    if (f) importBackup(f);
+    e.target.value = "";
+  });
+}
+
+function closeCatSheet() {
+  document.getElementById("cat-sheet-backdrop").classList.remove("open");
+  openPalette = null;
+  expandedCatInEditor = null;
+}
+
+/* ───────────────────────────────────────────────────────────
+   Boot
+   ─────────────────────────────────────────────────────────── */
+(async function init() {
+  entries = await store.loadEntries();
+  const settings = await store.loadSettings();
+
+  if (settings && Array.isArray(settings.categories) && settings.categories.length > 0) {
+    categories = settings.categories;
+    budgets = (settings.budgets && typeof settings.budgets === "object") ? settings.budgets : {};
+  } else {
+    categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    budgets = {};
+  }
+
+  ensureSubArrays();
+
+  selectedCat = categories[0].id;
+
+  wire();
+  renderChips();
+  renderAll();
+})();
+</script>
+
+</body>
+</html>
