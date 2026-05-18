@@ -1162,6 +1162,139 @@
     color: var(--accent);
   }
 
+  /* ── Cloud backup ───────────────────────────────── */
+  .cloud-btn--ok    { color: var(--accent); border-color: var(--accent-soft); }
+  .cloud-btn--muted { color: var(--ink-3); }
+  .cloud-btn--err   { color: var(--danger); border-color: var(--danger); }
+  .cloud-btn--pulse { animation: cloud-pulse 1.2s ease-out 1; }
+  @keyframes cloud-pulse {
+    0%   { opacity: 1;   }
+    50%  { opacity: 0.45; }
+    100% { opacity: 1;   }
+  }
+
+  .data-btn-icon {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sans);
+    transition: all 0.15s ease;
+  }
+  .data-btn-icon:hover { border-color: var(--ink-2); color: var(--ink); }
+
+  .cloud-section {
+    margin-top: 8px;
+  }
+  .cloud-section + .cloud-section {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .field-label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .field-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .field-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--r-sm);
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: var(--sans);
+    color: var(--ink);
+    outline: none;
+    min-width: 0;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-help {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .field-help a { color: var(--accent); text-decoration: none; }
+  .field-help a:hover { text-decoration: underline; }
+  .field-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    border-radius: var(--r-sm);
+    padding: 8px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+
+  .cloud-primary {
+    width: 100%;
+    margin-top: 14px;
+    background: var(--accent);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--r-md);
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: opacity 0.15s ease;
+  }
+  .cloud-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cloud-primary:not(:disabled):hover { opacity: 0.9; }
+
+  .cloud-status-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .cloud-status-grid dt { color: var(--ink-3); }
+  .cloud-status-grid dd { margin: 0; color: var(--ink); }
+  .cloud-status-grid dd.err { color: var(--danger); }
+
+  .cloud-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .cloud-actions .data-btn { flex: 1; min-width: 120px; }
+  .cloud-btn-danger {
+    color: var(--danger);
+    border-color: var(--border);
+  }
+  .cloud-btn-danger:hover { border-color: var(--danger); }
+
+  .cloud-inline-error {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(162, 62, 44, 0.08);
+    border: 1px solid rgba(162, 62, 44, 0.2);
+    border-radius: var(--r-sm);
+    color: var(--danger);
+    font-size: 13px;
+  }
+
   @media (max-width: 380px) {
     .app { padding: 0 16px 80px; }
     .note-row { flex-direction: column; }
@@ -1244,8 +1377,10 @@
   <section id="view-categories" hidden></section>
 
   <div class="data-bar">
-    <button class="data-btn" id="btn-export">Export backup</button>
-    <button class="data-btn" id="btn-import">Import backup</button>
+    <button class="data-btn" id="btn-export">Export</button>
+    <button class="data-btn" id="btn-import">Import</button>
+    <button class="data-btn" id="btn-cloud">Cloud backup</button>
+    <button class="data-btn-icon" id="btn-cloud-settings" aria-label="Cloud backup settings">⚙</button>
     <input type="file" id="file-input" accept="application/json" hidden />
   </div>
 
@@ -1264,6 +1399,54 @@
   </div>
 </div>
 
+<!-- Cloud backup sheet -->
+<div class="sheet-backdrop" id="cloud-sheet-backdrop">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-header">
+      <div class="sheet-title">Cloud backup</div>
+      <button class="sheet-close" id="cloud-sheet-close" aria-label="Close">×</button>
+    </div>
+    <div class="sheet-body">
+      <div class="cloud-section">
+        <p class="field-help" style="margin-top: 0; margin-bottom: 16px;">
+          Push your ledger to a private GitHub Gist. You stay in control of the data on GitHub's side.
+        </p>
+
+        <label class="field-label" for="cloud-token">Personal access token</label>
+        <div class="field-row">
+          <input class="field-input" id="cloud-token" type="password" placeholder="ghp_..." autocomplete="off" spellcheck="false" />
+          <button class="field-toggle" id="cloud-token-toggle" type="button">Show</button>
+        </div>
+        <div class="field-help">
+          Needs the <strong>gist</strong> scope only.
+          <a id="cloud-token-create" href="https://github.com/settings/tokens/new?scopes=gist&description=Ledger" target="_blank" rel="noopener">Create one →</a>
+        </div>
+
+        <label class="field-label" for="cloud-gist-id" style="margin-top: 16px;">Gist ID</label>
+        <input class="field-input" id="cloud-gist-id" type="text" placeholder="a1b2c3d4e5f6..." autocomplete="off" spellcheck="false" />
+        <div class="field-help">
+          Create a private gist on github.com, paste its ID (the last segment of the URL).
+        </div>
+
+        <button class="cloud-primary" id="cloud-connect-btn" disabled>Connect</button>
+        <div class="cloud-inline-error" id="cloud-inline-error" hidden></div>
+      </div>
+
+      <div class="cloud-section" id="cloud-connected-section" hidden>
+        <dl class="cloud-status-grid">
+          <dt>Status</dt><dd id="cloud-status-text">—</dd>
+          <dt>Pending</dt><dd id="cloud-pending-text">0 changes</dd>
+          <dt>Last error</dt><dd id="cloud-error-text">—</dd>
+        </dl>
+        <div class="cloud-actions">
+          <button class="data-btn" id="cloud-restore-btn">Restore from gist</button>
+          <button class="data-btn cloud-btn-danger" id="cloud-disconnect-btn">Disconnect</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1274,6 +1457,7 @@
    ─────────────────────────────────────────────────────────── */
 const ENTRIES_KEY = "ledger:entries:v1";
 const SETTINGS_KEY = "ledger:settings:v1";
+const CLOUD_KEY = "ledger:cloud:v1";
 
 const store = {
   hasWindowStorage() {
@@ -1310,7 +1494,9 @@ const store = {
   loadEntries() { return this.loadKey(ENTRIES_KEY, []); },
   saveEntries(v) { return this.saveKey(ENTRIES_KEY, v); },
   loadSettings() { return this.loadKey(SETTINGS_KEY, null); },
-  saveSettings(v) { return this.saveKey(SETTINGS_KEY, v); }
+  saveSettings(v) { return this.saveKey(SETTINGS_KEY, v); },
+  loadCloud() { return this.loadKey(CLOUD_KEY, null); },
+  saveCloud(v) { return this.saveKey(CLOUD_KEY, v); }
 };
 
 /* ───────────────────────────────────────────────────────────
@@ -1329,6 +1515,10 @@ const DEFAULT_CATEGORIES = [
   { id: "bills",         name: "Bills",         color: "#5C6B7A", subcategories: [] },
   { id: "entertainment", name: "Entertainment", color: "#B8884C", subcategories: [] },
   { id: "health",        name: "Health",        color: "#7A5C6B", subcategories: [] },
+  { id: "travel",        name: "Travel",        color: "#4F7C8B", subcategories: [] },
+  { id: "family",        name: "Family",        color: "#B07A7A", subcategories: [] },
+  { id: "groceries",     name: "Groceries",     color: "#5F8C5A", subcategories: [] },
+  { id: "gifts",         name: "Gifts",         color: "#9572A6", subcategories: [] },
   { id: "other",         name: "Other",         color: "#8C8275", subcategories: [] },
 ];
 
@@ -1339,6 +1529,10 @@ const CATEGORY_ICONS = {
   bills: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-1.5L12 21l-2.5-1.5L7 21V3z"/><path d="M10 8h4M10 12h4M10 16h2"/></svg>`,
   entertainment: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="1.5"/><path d="M3.5 9h17M3.5 15h17"/><path d="M7 5v14M17 5v14"/></svg>`,
   health: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h3l2-4 3 8 2-5 2 3h6"/></svg>`,
+  travel: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2z"/></svg>`,
+  family: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="16.5" cy="9.5" r="2.3"/><path d="M21 19c0-2.2-1.5-4.1-3.7-4.8"/></svg>`,
+  groceries: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2 3h3l2.4 11.4a1.6 1.6 0 0 0 1.6 1.3h9.2a1.6 1.6 0 0 0 1.6-1.3L21 7H6"/></svg>`,
+  gifts: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4"/><path d="M12 8v13"/><path d="M5 12v9h14v-9"/><path d="M12 8H7.5a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8z"/><path d="M12 8h4.5a2.5 2.5 0 0 0 0-5C13 3 12 8 12 8z"/></svg>`,
   other: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="8.5" cy="12" r="0.9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none"/><circle cx="15.5" cy="12" r="0.9" fill="currentColor" stroke="none"/></svg>`,
 };
 
@@ -1361,6 +1555,20 @@ let viewMonth = currentMonth();
 let focusedCategory = null;     // category id when drilled into sub-breakdown
 let expandedCatInEditor = null; // category id whose sub-editor is open
 let openPalette = null;         // { type:"cat", catId } | { type:"sub", catId, subId } | null
+let cloudConfig = defaultCloudConfig();
+let lastPendingCount = 0;       // for pulse-on-cross-threshold detection
+
+function defaultCloudConfig() {
+  return {
+    token: "",
+    gistId: "",
+    filename: "ledger-backup.json",
+    enabled: false,
+    lastSyncAt: null,
+    lastError: null,
+    pendingChanges: 0
+  };
+}
 
 /* ───────────────────────────────────────────────────────────
    Utilities
@@ -1465,6 +1673,7 @@ function escapeHtml(s) {
    ─────────────────────────────────────────────────────────── */
 async function persistSettings() {
   await store.saveSettings({ categories, budgets });
+  markDirty();
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -2102,6 +2311,7 @@ async function addEntry(amount, category, subcategory, note, date) {
     createdAt: Date.now()
   });
   await store.saveEntries(entries);
+  markDirty();
   renderAll();
 }
 
@@ -2116,6 +2326,7 @@ async function updateEntry(id, amount, category, subcategory, note, date) {
     updatedAt: Date.now()
   };
   await store.saveEntries(entries);
+  markDirty();
 }
 
 async function deleteEntry(id) {
@@ -2123,6 +2334,7 @@ async function deleteEntry(id) {
   if (editingId === id) cancelEditMode();
   expandedId = null;
   await store.saveEntries(entries);
+  markDirty();
   renderAll();
   toast("Entry removed");
 }
@@ -2364,17 +2576,7 @@ function hideBudgetEditor() {
    Backup
    ─────────────────────────────────────────────────────────── */
 function exportBackup() {
-  const payload = {
-    app: "Ledger",
-    version: 3,
-    exportedAt: new Date().toISOString(),
-    data: {
-      entries,
-      categories,
-      budgets
-    }
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(buildBackupPayload(), null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -2393,36 +2595,248 @@ function importBackup(file) {
       const raw = JSON.parse(e.target.result);
       const d = (raw && raw.data) ? raw.data : null;
       if (!d || !Array.isArray(d.entries)) throw new Error("Not a Ledger backup");
-
       const ok = confirm(`Import ${d.entries.length} entries? This will replace your current ledger and settings.`);
       if (!ok) return;
-
-      entries = d.entries.map(en => ({
-        id: en.id || uid(),
-        amount: Number(en.amount) || 0,
-        category: en.category || "other",
-        note: en.note || "",
-        date: en.date || todayYMD(),
-        createdAt: en.createdAt || Date.now()
-      }));
-
-      if (Array.isArray(d.categories) && d.categories.length > 0) {
-        categories = d.categories;
-      }
-      budgets = (d.budgets && typeof d.budgets === "object") ? d.budgets : {};
-
-      selectedCat = categories[0].id;
-
-      await store.saveEntries(entries);
-      await persistSettings();
-      renderChips();
-      renderAll();
+      await applyBackupPayload(d);
       toast(`Imported ${entries.length} entries`);
     } catch (err) {
       alert("Couldn't import: " + err.message);
     }
   };
   reader.readAsText(file);
+}
+
+async function applyBackupPayload(d) {
+  entries = d.entries.map(en => ({
+    id: en.id || uid(),
+    amount: Number(en.amount) || 0,
+    category: en.category || "other",
+    subcategory: en.subcategory || null,
+    note: en.note || "",
+    date: en.date || todayYMD(),
+    createdAt: en.createdAt || Date.now()
+  }));
+
+  if (Array.isArray(d.categories) && d.categories.length > 0) {
+    categories = d.categories;
+  }
+  ensureSubArrays();
+  budgets = (d.budgets && typeof d.budgets === "object") ? d.budgets : {};
+
+  selectedCat = categories[0].id;
+  selectedSub = null;
+
+  await store.saveEntries(entries);
+  await persistSettings();
+  renderChips();
+  renderAll();
+}
+
+/* ───────────────────────────────────────────────────────────
+   Cloud backup (GitHub Gist)
+   ─────────────────────────────────────────────────────────── */
+function markDirty() {
+  if (!cloudConfig.enabled) return;
+  cloudConfig.pendingChanges = (cloudConfig.pendingChanges || 0) + 1;
+  store.saveCloud(cloudConfig);
+  renderCloudStatus();
+}
+
+function buildBackupPayload() {
+  return {
+    app: "Ledger",
+    version: 3,
+    exportedAt: new Date().toISOString(),
+    data: { entries, categories, budgets }
+  };
+}
+
+function describeFetchError(status) {
+  if (status === 401) return "Bad token — generate a new one with gist scope.";
+  if (status === 404) return "Gist not found — check the ID.";
+  if (status === 403) return "Rate limited or forbidden — try again later.";
+  return `Sync failed (${status}).`;
+}
+
+async function cloudPush() {
+  if (!cloudConfig.token || !cloudConfig.gistId) {
+    return { ok: false, error: "Not configured" };
+  }
+  const inFlight = cloudConfig.pendingChanges || 0;
+  const payload = JSON.stringify(buildBackupPayload(), null, 2);
+
+  try {
+    const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId}`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `token ${cloudConfig.token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        files: { [cloudConfig.filename]: { content: payload } }
+      })
+    });
+    if (!res.ok) throw new Error(describeFetchError(res.status));
+    cloudConfig.lastSyncAt = Date.now();
+    cloudConfig.lastError = null;
+    cloudConfig.pendingChanges = Math.max(0, (cloudConfig.pendingChanges || 0) - inFlight);
+    await store.saveCloud(cloudConfig);
+    renderCloudStatus();
+    return { ok: true };
+  } catch (e) {
+    const msg = e.message || String(e);
+    cloudConfig.lastError = msg;
+    await store.saveCloud(cloudConfig);
+    renderCloudStatus();
+    return { ok: false, error: msg };
+  }
+}
+
+async function cloudPull() {
+  if (!cloudConfig.token || !cloudConfig.gistId) {
+    throw new Error("Not configured");
+  }
+  const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId}`, {
+    headers: {
+      "Authorization": `token ${cloudConfig.token}`,
+      "Accept": "application/vnd.github+json"
+    }
+  });
+  if (!res.ok) throw new Error(describeFetchError(res.status));
+  const gist = await res.json();
+  const file = (gist.files && gist.files[cloudConfig.filename])
+    || (gist.files && Object.values(gist.files).find(f => f && f.filename && f.filename.endsWith(".json")));
+  if (!file || !file.content) throw new Error("Backup file not found in gist");
+  let payload;
+  try {
+    payload = JSON.parse(file.content);
+  } catch (e) {
+    throw new Error("Gist content isn't valid JSON");
+  }
+  const d = payload && payload.data;
+  if (!d || !Array.isArray(d.entries)) throw new Error("Not a Ledger backup");
+  return d;
+}
+
+function relativeTime(ts) {
+  if (!ts) return "never";
+  const now = Date.now();
+  const diff = now - ts;
+  if (diff < 60_000) return "just now";
+  if (diff < 3600_000) {
+    const m = Math.floor(diff / 60_000);
+    return `${m} min ago`;
+  }
+  if (diff < 86_400_000) {
+    const h = Math.floor(diff / 3600_000);
+    return `${h} hr${h === 1 ? "" : "s"} ago`;
+  }
+  const then = new Date(ts);
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  if (startOfToday - then.getTime() < 86_400_000) return "yesterday";
+  if (diff < 7 * 86_400_000) {
+    return then.toLocaleDateString(undefined, { weekday: "short" });
+  }
+  return then.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function renderCloudStatus() {
+  const btn = document.getElementById("btn-cloud");
+  if (!btn) return;
+
+  btn.classList.remove("cloud-btn--ok", "cloud-btn--muted", "cloud-btn--err");
+
+  const configured = cloudConfig.enabled && cloudConfig.token && cloudConfig.gistId;
+  const pending = cloudConfig.pendingChanges || 0;
+
+  if (!configured) {
+    btn.textContent = "Cloud backup";
+    btn.classList.add("cloud-btn--muted");
+    btn.dataset.action = "open-sheet";
+  } else if (cloudConfig.lastError) {
+    btn.textContent = "Sync failed · retry";
+    btn.classList.add("cloud-btn--err");
+    btn.dataset.action = "push";
+  } else if (pending >= 10) {
+    btn.textContent = `Sync · ${pending} changes`;
+    btn.classList.add("cloud-btn--err");
+    btn.dataset.action = "push";
+  } else if (pending > 0) {
+    btn.textContent = `Sync · ${pending} ${pending === 1 ? "change" : "changes"}`;
+    btn.classList.add("cloud-btn--ok");
+    btn.dataset.action = "push";
+  } else {
+    btn.textContent = `Synced · ${relativeTime(cloudConfig.lastSyncAt)}`;
+    btn.classList.add("cloud-btn--muted");
+    btn.dataset.action = "open-sheet";
+  }
+
+  // Pulse when crossing the 10-change threshold (no error).
+  if (!cloudConfig.lastError && lastPendingCount < 10 && pending >= 10) {
+    btn.classList.remove("cloud-btn--pulse");
+    void btn.offsetWidth; // restart animation
+    btn.classList.add("cloud-btn--pulse");
+  }
+  lastPendingCount = pending;
+
+  // Status sheet detail (if open).
+  const sheetOpen = document.getElementById("cloud-sheet-backdrop").classList.contains("open");
+  if (sheetOpen) renderCloudSheetState();
+}
+
+function renderCloudSheetState() {
+  const connected = cloudConfig.enabled && cloudConfig.token && cloudConfig.gistId;
+  const connectedSection = document.getElementById("cloud-connected-section");
+  connectedSection.hidden = !connected;
+
+  const connectBtn = document.getElementById("cloud-connect-btn");
+  connectBtn.textContent = connected ? "Re-connect" : "Connect";
+
+  document.getElementById("cloud-token").value = cloudConfig.token || "";
+  document.getElementById("cloud-gist-id").value = cloudConfig.gistId || "";
+  updateConnectBtnEnabled();
+
+  if (connected) {
+    const pending = cloudConfig.pendingChanges || 0;
+    document.getElementById("cloud-status-text").textContent =
+      cloudConfig.lastSyncAt ? `Synced ${relativeTime(cloudConfig.lastSyncAt)}` : "Not yet synced";
+    document.getElementById("cloud-pending-text").textContent =
+      `${pending} ${pending === 1 ? "change" : "changes"}`;
+    const errEl = document.getElementById("cloud-error-text");
+    if (cloudConfig.lastError) {
+      errEl.textContent = cloudConfig.lastError;
+      errEl.classList.add("err");
+    } else {
+      errEl.textContent = "—";
+      errEl.classList.remove("err");
+    }
+  }
+}
+
+function updateConnectBtnEnabled() {
+  const t = document.getElementById("cloud-token").value.trim();
+  const g = document.getElementById("cloud-gist-id").value.trim();
+  document.getElementById("cloud-connect-btn").disabled = !(t && g);
+}
+
+function showCloudInlineError(msg) {
+  const el = document.getElementById("cloud-inline-error");
+  if (!msg) { el.hidden = true; el.textContent = ""; return; }
+  el.textContent = msg;
+  el.hidden = false;
+}
+
+function openCloudSheet() {
+  showCloudInlineError(null);
+  document.getElementById("cloud-sheet-backdrop").classList.add("open");
+  renderCloudSheetState();
+}
+
+function closeCloudSheet() {
+  document.getElementById("cloud-sheet-backdrop").classList.remove("open");
+  showCloudInlineError(null);
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -2559,6 +2973,134 @@ function wire() {
     if (f) importBackup(f);
     e.target.value = "";
   });
+
+  // Cloud backup — primary action button (sync or open sheet)
+  document.getElementById("btn-cloud").addEventListener("click", async (e) => {
+    const action = e.currentTarget.dataset.action;
+    if (action === "push") {
+      e.currentTarget.disabled = true;
+      const before = e.currentTarget.textContent;
+      e.currentTarget.textContent = "Syncing…";
+      const result = await cloudPush();
+      e.currentTarget.disabled = false;
+      if (result.ok) {
+        toast("Synced to gist");
+      } else {
+        toast("Sync failed");
+        // Status render already updated the label/color; nothing else to do.
+      }
+      // renderCloudStatus inside cloudPush has already updated the label.
+      // (Fallback in case action changed mid-flight.)
+      if (e.currentTarget.textContent === "Syncing…") {
+        e.currentTarget.textContent = before;
+      }
+    } else {
+      openCloudSheet();
+    }
+  });
+
+  document.getElementById("btn-cloud-settings").addEventListener("click", openCloudSheet);
+  document.getElementById("cloud-sheet-close").addEventListener("click", closeCloudSheet);
+  document.getElementById("cloud-sheet-backdrop").addEventListener("click", (e) => {
+    if (e.target.id === "cloud-sheet-backdrop") closeCloudSheet();
+  });
+
+  // Token show/hide toggle
+  document.getElementById("cloud-token-toggle").addEventListener("click", () => {
+    const input = document.getElementById("cloud-token");
+    const btn = document.getElementById("cloud-token-toggle");
+    if (input.type === "password") {
+      input.type = "text";
+      btn.textContent = "Hide";
+    } else {
+      input.type = "password";
+      btn.textContent = "Show";
+    }
+  });
+
+  // Enable Connect when both fields have content
+  document.getElementById("cloud-token").addEventListener("input", updateConnectBtnEnabled);
+  document.getElementById("cloud-gist-id").addEventListener("input", updateConnectBtnEnabled);
+
+  // Connect — save creds, validate via initial push
+  document.getElementById("cloud-connect-btn").addEventListener("click", async () => {
+    const token = document.getElementById("cloud-token").value.trim();
+    const gistId = document.getElementById("cloud-gist-id").value.trim();
+    if (!token || !gistId) return;
+    showCloudInlineError(null);
+
+    const wasEnabled = cloudConfig.enabled;
+    cloudConfig.token = token;
+    cloudConfig.gistId = gistId;
+    cloudConfig.enabled = true; // tentatively enable so cloudPush proceeds
+    await store.saveCloud(cloudConfig);
+
+    const connectBtn = document.getElementById("cloud-connect-btn");
+    connectBtn.disabled = true;
+    const origLabel = connectBtn.textContent;
+    connectBtn.textContent = "Connecting…";
+
+    const result = await cloudPush();
+
+    connectBtn.textContent = origLabel;
+    connectBtn.disabled = false;
+
+    if (result.ok) {
+      // Successful initial push — full reset to a synced state.
+      cloudConfig.pendingChanges = 0;
+      await store.saveCloud(cloudConfig);
+      renderCloudStatus();
+      renderCloudSheetState();
+      toast("Cloud backup connected");
+      closeCloudSheet();
+    } else {
+      // Revert enabled if this was a fresh connect attempt that failed.
+      if (!wasEnabled) cloudConfig.enabled = false;
+      await store.saveCloud(cloudConfig);
+      renderCloudStatus();
+      renderCloudSheetState();
+      showCloudInlineError(result.error || "Couldn't connect");
+    }
+  });
+
+  // Restore from gist
+  document.getElementById("cloud-restore-btn").addEventListener("click", async () => {
+    const restoreBtn = document.getElementById("cloud-restore-btn");
+    restoreBtn.disabled = true;
+    const origLabel = restoreBtn.textContent;
+    restoreBtn.textContent = "Fetching…";
+    try {
+      const d = await cloudPull();
+      const ok = confirm(`Import ${d.entries.length} entries from gist? This will replace your current ledger and settings.`);
+      if (!ok) return;
+      await applyBackupPayload(d);
+      // After pulling, local = gist, so pending is zero.
+      cloudConfig.pendingChanges = 0;
+      cloudConfig.lastSyncAt = Date.now();
+      cloudConfig.lastError = null;
+      await store.saveCloud(cloudConfig);
+      renderCloudStatus();
+      renderCloudSheetState();
+      toast(`Restored ${d.entries.length} entries`);
+    } catch (e) {
+      showCloudInlineError(e.message || "Restore failed");
+    } finally {
+      restoreBtn.disabled = false;
+      restoreBtn.textContent = origLabel;
+    }
+  });
+
+  // Disconnect
+  document.getElementById("cloud-disconnect-btn").addEventListener("click", async () => {
+    const ok = confirm("Disconnect cloud backup? Your gist on GitHub will remain untouched.");
+    if (!ok) return;
+    cloudConfig = defaultCloudConfig();
+    await store.saveCloud(cloudConfig);
+    renderCloudStatus();
+    renderCloudSheetState();
+    showCloudInlineError(null);
+    toast("Cloud backup disconnected");
+  });
 }
 
 function closeCatSheet() {
@@ -2573,6 +3115,7 @@ function closeCatSheet() {
 (async function init() {
   entries = await store.loadEntries();
   const settings = await store.loadSettings();
+  const cloud = await store.loadCloud();
 
   if (settings && Array.isArray(settings.categories) && settings.categories.length > 0) {
     categories = settings.categories;
@@ -2582,6 +3125,11 @@ function closeCatSheet() {
     budgets = {};
   }
 
+  if (cloud && typeof cloud === "object") {
+    cloudConfig = { ...defaultCloudConfig(), ...cloud };
+  }
+  lastPendingCount = cloudConfig.pendingChanges || 0;
+
   ensureSubArrays();
 
   selectedCat = categories[0].id;
@@ -2589,6 +3137,7 @@ function closeCatSheet() {
   wire();
   renderChips();
   renderAll();
+  renderCloudStatus();
 })();
 </script>
 
