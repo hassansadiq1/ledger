@@ -1162,6 +1162,111 @@
     color: var(--accent);
   }
 
+  /* ── Bill reminders ─────────────────────────────── */
+  .reminder-stack {
+    margin: 16px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .reminder-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--warn);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ink);
+    animation: reminderIn 0.3s ease;
+  }
+  .reminder-banner.overdue { border-left-color: var(--danger); }
+  @keyframes reminderIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reminder-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .reminder-title {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .reminder-sub {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .reminder-sub.overdue { color: var(--danger); }
+  .reminder-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .reminder-log-btn {
+    background: var(--accent);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: var(--sans);
+    cursor: pointer;
+  }
+  .reminder-log-btn:hover { opacity: 0.9; }
+  .reminder-dismiss-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-3);
+    border-radius: var(--r-sm);
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: var(--sans);
+    cursor: pointer;
+    line-height: 1;
+  }
+  .reminder-dismiss-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  /* Due day in subcategory editor */
+  .sub-due-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding-left: 30px; /* align with name input (past swatch) */
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .sub-due-input {
+    width: 56px;
+    border: 1px solid var(--border);
+    background: transparent;
+    border-radius: var(--r-sm);
+    padding: 5px 8px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    text-align: center;
+  }
+  .sub-due-input:focus { border-color: var(--accent); background: var(--surface); }
+  .sub-due-clear {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    cursor: pointer;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    padding: 4px 6px;
+  }
+  .sub-due-clear:hover { color: var(--danger); }
+
   /* ── Cloud backup ───────────────────────────────── */
   .cloud-btn--ok    { color: var(--accent); border-color: var(--accent-soft); }
   .cloud-btn--muted { color: var(--ink-3); }
@@ -1314,6 +1419,8 @@
     </div>
   </header>
 
+  <div class="reminder-stack" id="reminder-stack" hidden></div>
+
   <section class="hero">
     <div class="hero-label" id="hero-label">This month</div>
     <div class="hero-amount" id="hero-amount">
@@ -1458,6 +1565,7 @@
 const ENTRIES_KEY = "ledger:entries:v1";
 const SETTINGS_KEY = "ledger:settings:v1";
 const CLOUD_KEY = "ledger:cloud:v1";
+const REMINDERS_DISMISSED_KEY = "ledger:reminders:dismissed:v1";
 
 const store = {
   hasWindowStorage() {
@@ -1496,7 +1604,9 @@ const store = {
   loadSettings() { return this.loadKey(SETTINGS_KEY, null); },
   saveSettings(v) { return this.saveKey(SETTINGS_KEY, v); },
   loadCloud() { return this.loadKey(CLOUD_KEY, null); },
-  saveCloud(v) { return this.saveKey(CLOUD_KEY, v); }
+  saveCloud(v) { return this.saveKey(CLOUD_KEY, v); },
+  loadDismissedReminders() { return this.loadKey(REMINDERS_DISMISSED_KEY, {}); },
+  saveDismissedReminders(v) { return this.saveKey(REMINDERS_DISMISSED_KEY, v); }
 };
 
 /* ───────────────────────────────────────────────────────────
@@ -1557,6 +1667,7 @@ let expandedCatInEditor = null; // category id whose sub-editor is open
 let openPalette = null;         // { type:"cat", catId } | { type:"sub", catId, subId } | null
 let cloudConfig = defaultCloudConfig();
 let lastPendingCount = 0;       // for pulse-on-cross-threshold detection
+let dismissedReminders = {};    // { "catId:subId:YYYY-MM": true }
 
 function defaultCloudConfig() {
   return {
@@ -2168,12 +2279,19 @@ function renderCatEditor() {
     const subRows = subs.map(s => {
       const isSubPaletteOpen = openPalette && openPalette.type === "sub"
         && openPalette.catId === c.id && openPalette.subId === s.id;
+      const dueVal = (typeof s.dueDay === "number" && s.dueDay >= 1) ? String(s.dueDay) : "";
       return `
         <div class="sub-edit-row" data-cat-id="${c.id}" data-sub-id="${s.id}">
           <div class="sub-edit-main">
             <div class="sub-swatch" data-action="toggle-sub-palette" data-cat-id="${c.id}" data-sub-id="${s.id}" style="--dot:${s.color};"></div>
             <input class="sub-name-input" data-cat-id="${c.id}" data-sub-id="${s.id}" type="text" value="${escapeHtml(s.name)}" maxlength="30" />
             <button class="sub-delete-btn" data-action="delete-sub" data-cat-id="${c.id}" data-sub-id="${s.id}" aria-label="Delete subcategory">×</button>
+          </div>
+          <div class="sub-due-row">
+            <span>Remind on day</span>
+            <input class="sub-due-input" data-cat-id="${c.id}" data-sub-id="${s.id}" type="number" inputmode="numeric" min="1" max="31" placeholder="—" value="${dueVal}" />
+            <span>of month</span>
+            ${dueVal ? `<button class="sub-due-clear" data-action="clear-due" data-cat-id="${c.id}" data-sub-id="${s.id}" aria-label="Clear due day">clear</button>` : ""}
           </div>
           <div class="sub-palette ${isSubPaletteOpen ? "open" : ""}" data-cat-id="${c.id}" data-sub-id="${s.id}">
             ${PALETTE.map(col => `
@@ -2234,6 +2352,35 @@ function renderCatEditor() {
       else if (sub) input.value = sub.name;
     });
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+  });
+
+  root.querySelectorAll(".sub-due-input").forEach(input => {
+    const commit = () => {
+      const { catId, subId } = input.dataset;
+      const raw = input.value.trim();
+      if (raw === "") {
+        setSubcategoryDueDay(catId, subId, null).then(() => renderCatEditor());
+        return;
+      }
+      let n = parseInt(raw, 10);
+      if (!Number.isFinite(n)) {
+        const sub = subById(catId, subId);
+        input.value = sub && sub.dueDay ? String(sub.dueDay) : "";
+        return;
+      }
+      n = Math.max(1, Math.min(31, n));
+      input.value = String(n);
+      setSubcategoryDueDay(catId, subId, n).then(() => renderCatEditor());
+    };
+    input.addEventListener("blur", commit);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+  });
+
+  root.querySelectorAll("[data-action='clear-due']").forEach(el => {
+    el.addEventListener("click", () => {
+      const { catId, subId } = el.dataset;
+      setSubcategoryDueDay(catId, subId, null).then(() => renderCatEditor());
+    });
   });
 
   root.querySelectorAll("[data-action='toggle-palette']").forEach(el => {
@@ -2633,6 +2780,127 @@ async function applyBackupPayload(d) {
 }
 
 /* ───────────────────────────────────────────────────────────
+   Bill reminders — per-subcategory due day, in-app banner
+   ─────────────────────────────────────────────────────────── */
+function lastDayOfMonth(yyyymm) {
+  const [y, m] = yyyymm.split("-").map(Number);
+  return new Date(y, m, 0).getDate();
+}
+
+function dueDateOf(sub, yyyymm) {
+  const dueDay = Math.min(sub.dueDay, lastDayOfMonth(yyyymm));
+  return `${yyyymm}-${String(dueDay).padStart(2, "0")}`;
+}
+
+function hasEntryThisMonth(catId, subId, yyyymm) {
+  return entries.some(e =>
+    monthOf(e.date) === yyyymm &&
+    e.category === catId &&
+    e.subcategory === subId
+  );
+}
+
+function reminderKey(catId, subId, yyyymm) {
+  return `${catId}:${subId}:${yyyymm}`;
+}
+
+function getPendingReminders() {
+  const today = todayYMD();
+  const month = currentMonth();
+  const out = [];
+  categories.forEach(cat => {
+    (cat.subcategories || []).forEach(sub => {
+      if (!sub.dueDay) return;
+      const due = dueDateOf(sub, month);
+      if (today < due) return;
+      if (hasEntryThisMonth(cat.id, sub.id, month)) return;
+      if (dismissedReminders[reminderKey(cat.id, sub.id, month)]) return;
+      const daysOverdue = Math.round(
+        (new Date(today + "T00:00:00") - new Date(due + "T00:00:00")) / 86_400_000
+      );
+      out.push({ cat, sub, due, daysOverdue });
+    });
+  });
+  return out;
+}
+
+function renderReminderBanner() {
+  const stack = document.getElementById("reminder-stack");
+  const reminders = getPendingReminders();
+
+  if (reminders.length === 0) {
+    stack.hidden = true;
+    stack.innerHTML = "";
+    return;
+  }
+
+  stack.hidden = false;
+  stack.innerHTML = reminders.map(r => {
+    const overdue = r.daysOverdue > 0;
+    const subLabel = overdue
+      ? `${r.daysOverdue} ${r.daysOverdue === 1 ? "day" : "days"} overdue · in ${escapeHtml(r.cat.name)}`
+      : `due today · in ${escapeHtml(r.cat.name)}`;
+    return `
+      <div class="reminder-banner ${overdue ? "overdue" : ""}" data-cat-id="${r.cat.id}" data-sub-id="${r.sub.id}">
+        <div class="reminder-body">
+          <div class="reminder-title">${escapeHtml(r.sub.name)}</div>
+          <div class="reminder-sub ${overdue ? "overdue" : ""}">${subLabel}</div>
+        </div>
+        <div class="reminder-actions">
+          <button class="reminder-log-btn" data-action="reminder-log" data-cat-id="${r.cat.id}" data-sub-id="${r.sub.id}">Log</button>
+          <button class="reminder-dismiss-btn" data-action="reminder-dismiss" data-cat-id="${r.cat.id}" data-sub-id="${r.sub.id}" aria-label="Snooze for this month">×</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  stack.querySelectorAll("[data-action='reminder-log']").forEach(el => {
+    el.addEventListener("click", () => {
+      prefillFromReminder(el.dataset.catId, el.dataset.subId);
+    });
+  });
+  stack.querySelectorAll("[data-action='reminder-dismiss']").forEach(el => {
+    el.addEventListener("click", () => {
+      dismissReminder(el.dataset.catId, el.dataset.subId);
+    });
+  });
+}
+
+function prefillFromReminder(catId, subId) {
+  if (!categories.find(c => c.id === catId)) return;
+  selectedCat = catId;
+  selectedSub = subId;
+  // Date defaults to today; user just enters the amount.
+  document.getElementById("in-date").value = todayYMD();
+  document.getElementById("in-note").value = "";
+  document.getElementById("in-amount").value = "";
+  renderChips();
+  const amountEl = document.getElementById("in-amount");
+  document.getElementById("add-card").scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => amountEl.focus(), 250);
+}
+
+async function dismissReminder(catId, subId) {
+  const month = currentMonth();
+  dismissedReminders[reminderKey(catId, subId, month)] = true;
+  await store.saveDismissedReminders(dismissedReminders);
+  renderReminderBanner();
+}
+
+async function setSubcategoryDueDay(catId, subId, dueDay) {
+  const sub = subById(catId, subId);
+  if (!sub) return;
+  if (dueDay === null || dueDay === undefined || dueDay === "") {
+    delete sub.dueDay;
+  } else {
+    const n = parseInt(dueDay, 10);
+    if (!Number.isFinite(n) || n < 1 || n > 31) return;
+    sub.dueDay = n;
+  }
+  await persistSettings();
+  renderReminderBanner();
+}
+
+/* ───────────────────────────────────────────────────────────
    Cloud backup (GitHub Gist)
    ─────────────────────────────────────────────────────────── */
 function markDirty() {
@@ -2856,6 +3124,7 @@ function toast(msg) {
    ─────────────────────────────────────────────────────────── */
 function renderAll() {
   renderMonthNav();
+  renderReminderBanner();
   renderHero();
   renderRecent();
   renderCategoriesView();
@@ -3116,6 +3385,7 @@ function closeCatSheet() {
   entries = await store.loadEntries();
   const settings = await store.loadSettings();
   const cloud = await store.loadCloud();
+  dismissedReminders = (await store.loadDismissedReminders()) || {};
 
   if (settings && Array.isArray(settings.categories) && settings.categories.length > 0) {
     categories = settings.categories;
