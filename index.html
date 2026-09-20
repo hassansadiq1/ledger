@@ -1400,6 +1400,212 @@
     font-size: 13px;
   }
 
+  [hidden] { display: none !important; }
+
+  /* ── Loans ──────────────────────────────────────── */
+  .mode-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+  }
+  .mode-toggle:hover { border-color: var(--ink-3); color: var(--ink); }
+
+  .loan-section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+    font-weight: 500;
+    margin: 4px 2px 10px;
+  }
+
+  .loan-person {
+    border-bottom: 1px solid var(--border-soft);
+    padding: 14px 4px;
+    cursor: pointer;
+  }
+  .loan-person.settled { opacity: 0.72; }
+  .loan-person-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .loan-person-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .loan-person-amount {
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 36;
+    font-size: 19px;
+    color: var(--ink);
+    font-feature-settings: "tnum" 1;
+    white-space: nowrap;
+  }
+  .loan-person.settled .loan-person-amount {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--positive);
+  }
+  .loan-person-sub {
+    font-size: 12.5px;
+    color: var(--ink-3);
+    margin-top: 3px;
+  }
+  .loan-bar {
+    margin-top: 9px;
+    height: 5px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .loan-bar-fill {
+    height: 100%;
+    background: var(--positive);
+    border-radius: 999px;
+    transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    max-width: 100%;
+  }
+
+  .loan-detail {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    animation: slideIn 0.18s ease;
+    cursor: default;
+  }
+  .loan-txn {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13.5px;
+  }
+  .loan-txn + .loan-txn { border-top: 1px solid var(--border-soft); }
+  .loan-txn-what { color: var(--ink-2); min-width: 0; }
+  .loan-txn-reason {
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .loan-txn-date { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
+  .loan-txn-amount {
+    font-feature-settings: "tnum" 1;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .loan-txn.repay .loan-txn-amount { color: var(--positive); }
+  .loan-txn-del {
+    background: transparent;
+    border: none;
+    color: var(--ink-3);
+    font-size: 16px;
+    line-height: 1;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: var(--r-sm);
+  }
+  .loan-txn-del:hover { color: var(--danger); background: rgba(162, 62, 44, 0.08); }
+
+  .repay-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .repay-form input {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--r-sm);
+    padding: 9px 10px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    min-width: 0;
+  }
+  .repay-form input:focus { border-color: var(--ink-3); }
+  .repay-amount { flex: 1 1 96px; font-feature-settings: "tnum" 1; }
+  .repay-date { flex: 1 1 130px; }
+  .repay-btn {
+    flex: 0 0 auto;
+    background: var(--ink);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--r-sm);
+    padding: 9px 14px;
+    font-family: var(--sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .repay-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .repay-hint {
+    flex: 1 0 100%;
+    font-size: 11.5px;
+    color: var(--ink-3);
+  }
+  .repay-hint.over { color: var(--danger); }
+
+  .loan-person-actions {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-soft);
+  }
+  .loan-delete-person {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 7px 12px;
+    font-size: 12.5px;
+    font-family: var(--sans);
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .loan-delete-person:hover { color: var(--danger); border-color: var(--danger); }
+
+  .settled-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--border);
+    margin-top: 28px;
+    padding: 16px 2px 10px;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .settled-toggle:hover { color: var(--ink-2); }
+  .settled-caret { transition: transform 0.2s ease; }
+  .settled-toggle[aria-expanded="true"] .settled-caret { transform: rotate(180deg); }
+
   @media (max-width: 380px) {
     .app { padding: 0 16px 80px; }
     .note-row { flex-direction: column; }
@@ -1417,6 +1623,7 @@
       <div class="month-nav-label" id="month-label">—</div>
       <button class="month-nav-btn" id="month-next" aria-label="Next month">›</button>
     </div>
+    <button class="mode-toggle" id="mode-toggle">Loans</button>
   </header>
 
   <div class="reminder-stack" id="reminder-stack" hidden></div>
@@ -1482,6 +1689,41 @@
 
   <section id="view-recent"></section>
   <section id="view-categories" hidden></section>
+
+  <section id="loans-screen" hidden>
+    <div class="hero">
+      <div class="hero-label">Owed to you</div>
+      <div class="hero-amount">
+        <span class="currency">Rs</span><span id="loan-total">0</span>
+      </div>
+      <div class="hero-meta" id="loan-meta">No open loans</div>
+    </div>
+
+    <section class="add-card">
+      <div class="add-card-header">
+        <h2>New loan</h2>
+      </div>
+
+      <div class="amount-row">
+        <span class="cur">Rs</span>
+        <input id="loan-amount" type="text" inputmode="decimal" placeholder="0" autocomplete="off" />
+      </div>
+
+      <div class="note-row">
+        <input id="loan-name" type="text" placeholder="Who?" list="loan-names" autocomplete="off" />
+        <input id="loan-date" type="date" />
+      </div>
+      <datalist id="loan-names"></datalist>
+
+      <div class="note-row">
+        <input id="loan-reason" type="text" placeholder="Reason (optional)" autocomplete="off" />
+      </div>
+
+      <button class="save-btn" id="loan-save" disabled>Record loan</button>
+    </section>
+
+    <div id="loans-list"></div>
+  </section>
 
   <div class="data-bar">
     <button class="data-btn" id="btn-export">Export</button>
@@ -1566,6 +1808,7 @@ const ENTRIES_KEY = "ledger:entries:v1";
 const SETTINGS_KEY = "ledger:settings:v1";
 const CLOUD_KEY = "ledger:cloud:v1";
 const REMINDERS_DISMISSED_KEY = "ledger:reminders:dismissed:v1";
+const LOANS_KEY = "ledger:loans:v1";
 
 const store = {
   hasWindowStorage() {
@@ -1606,7 +1849,9 @@ const store = {
   loadCloud() { return this.loadKey(CLOUD_KEY, null); },
   saveCloud(v) { return this.saveKey(CLOUD_KEY, v); },
   loadDismissedReminders() { return this.loadKey(REMINDERS_DISMISSED_KEY, {}); },
-  saveDismissedReminders(v) { return this.saveKey(REMINDERS_DISMISSED_KEY, v); }
+  saveDismissedReminders(v) { return this.saveKey(REMINDERS_DISMISSED_KEY, v); },
+  loadLoans() { return this.loadKey(LOANS_KEY, []); },
+  saveLoans(v) { return this.saveKey(LOANS_KEY, v); }
 };
 
 /* ───────────────────────────────────────────────────────────
@@ -1668,6 +1913,10 @@ let openPalette = null;         // { type:"cat", catId } | { type:"sub", catId, 
 let cloudConfig = defaultCloudConfig();
 let lastPendingCount = 0;       // for pulse-on-cross-threshold detection
 let dismissedReminders = {};    // { "catId:subId:YYYY-MM": true }
+let loans = [];                 // [{ id, name, createdAt, txns: [...] }]
+let appMode = "ledger";         // "ledger" | "loans" — not persisted
+let expandedPersonId = null;    // person whose history is open
+let showSettled = false;        // settled section expanded?
 
 function defaultCloudConfig() {
   return {
@@ -1782,6 +2031,99 @@ function escapeHtml(s) {
 /* ───────────────────────────────────────────────────────────
    Persistence helpers
    ─────────────────────────────────────────────────────────── */
+/* ───────────────────────────────────────────────────────────
+   Loans — pure math over a person record. Every balance is
+   derived from the transaction list, never stored, so it
+   cannot drift out of sync with the history.
+   ─────────────────────────────────────────────────────────── */
+/* ── loan-math:start ── */
+function loanSumByType(person, type) {
+  const txns = (person && Array.isArray(person.txns)) ? person.txns : [];
+  return txns.reduce((sum, t) => t.type === type ? sum + (Number(t.amount) || 0) : sum, 0);
+}
+
+function loanLentTotal(person) { return loanSumByType(person, "lend"); }
+function loanRepaidTotal(person) { return loanSumByType(person, "repay"); }
+
+function loanOutstanding(person) {
+  return loanLentTotal(person) - loanRepaidTotal(person);
+}
+
+function loanIsSettled(person) {
+  const txns = (person && Array.isArray(person.txns)) ? person.txns : [];
+  return txns.length > 0 && loanOutstanding(person) <= 0;
+}
+
+function loanCapRepayment(person, amount) {
+  const n = Number(amount);
+  if (!(n > 0)) return 0;
+  return Math.min(n, Math.max(0, loanOutstanding(person)));
+}
+
+function loanTotalOutstanding(people) {
+  const list = Array.isArray(people) ? people : [];
+  return list.reduce((sum, p) => sum + Math.max(0, loanOutstanding(p)), 0);
+}
+
+function loanNormalizeName(name) {
+  return String(name == null ? "" : name).trim().toLowerCase();
+}
+
+function loanFindByName(people, name) {
+  const key = loanNormalizeName(name);
+  if (!key) return null;
+  const list = Array.isArray(people) ? people : [];
+  return list.find(p => loanNormalizeName(p.name) === key) || null;
+}
+
+function loanWithoutTxn(person, txnId) {
+  const txns = (person && Array.isArray(person.txns)) ? person.txns : [];
+  const remaining = txns.filter(t => t.id !== txnId);
+  if (remaining.length === 0) return null;
+  return { ...person, txns: remaining };
+}
+
+function loanLatestActivity(person) {
+  const txns = (person && Array.isArray(person.txns)) ? person.txns : [];
+  return txns.reduce((latest, t) => (t.date > latest ? t.date : latest), "");
+}
+
+function loanSortPeople(people) {
+  const list = Array.isArray(people) ? people : [];
+  return [...list].sort((a, b) => {
+    const da = loanLatestActivity(a);
+    const db = loanLatestActivity(b);
+    if (da !== db) return da < db ? 1 : -1;
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+}
+
+function normalizeLoans(raw, today, makeId) {
+  if (!Array.isArray(raw)) return [];
+  return raw.reduce((acc, p) => {
+    const name = String((p && p.name) || "").trim();
+    if (!name) return acc;
+    const id = (p && p.id) || makeId();
+    const rawTxns = (p && Array.isArray(p.txns)) ? p.txns : [];
+    const txns = rawTxns.reduce((list, t) => {
+      const type = t && t.type;
+      if (type !== "lend" && type !== "repay") return list;
+      list.push({
+        id: t.id || makeId(),
+        type,
+        amount: Number(t.amount) || 0,
+        reason: type === "lend" ? String(t.reason || "") : "",
+        date: t.date || today,
+        createdAt: Number(t.createdAt) || Date.now()
+      });
+      return list;
+    }, []);
+    acc.push({ id, name, createdAt: Number(p.createdAt) || Date.now(), txns });
+    return acc;
+  }, []);
+}
+/* ── loan-math:end ── */
+
 async function persistSettings() {
   await store.saveSettings({ categories, budgets });
   markDirty();
@@ -2037,6 +2379,269 @@ function renderRecent() {
       else { expandedId = (expandedId === id) ? null : id; renderRecent(); }
     });
   });
+}
+
+/* ───────────────────────────────────────────────────────────
+   Rendering — loans screen
+   ─────────────────────────────────────────────────────────── */
+function loanShortDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function renderLoanTxns(person) {
+  const sorted = [...person.txns].sort((a, b) => {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return b.createdAt - a.createdAt;
+  });
+
+  return sorted.map(t => {
+    const isLend = t.type === "lend";
+    const label = isLend
+      ? (t.reason ? escapeHtml(t.reason) : '<span style="color:var(--ink-3);font-style:italic">Lent</span>')
+      : "Repaid";
+    return `
+      <div class="loan-txn ${isLend ? "lend" : "repay"}">
+        <div class="loan-txn-what">
+          <div class="loan-txn-reason">${label}</div>
+          <div class="loan-txn-date">${loanShortDate(t.date)}</div>
+        </div>
+        <div class="loan-txn-amount">${isLend ? "" : "− "}${fmtMoney(t.amount)}</div>
+        <button class="loan-txn-del" data-action="del-txn" data-txn="${t.id}"
+                aria-label="Delete this ${isLend ? "loan" : "repayment"}">×</button>
+      </div>`;
+  }).join("");
+}
+
+function renderLoanPerson(person, settled) {
+  const lent = loanLentTotal(person);
+  const repaid = loanRepaidTotal(person);
+  const left = Math.max(0, loanOutstanding(person));
+  const pct = lent > 0 ? Math.min(100, (repaid / lent) * 100) : 0;
+  const isOpen = person.id === expandedPersonId;
+  const lendCount = person.txns.filter(t => t.type === "lend").length;
+
+  const lentOn = person.txns
+    .filter(t => t.type === "lend")
+    .reduce((latest, t) => (t.date > latest ? t.date : latest), "");
+  const suffix = lendCount > 1 ? ` · ${lendCount} loans` : "";
+
+  const sub = settled
+    ? `${fmtMoney(lent)} repaid in full · cleared ${loanShortDate(loanLatestActivity(person))}`
+    : repaid > 0
+      ? `${fmtMoney(left)} left of ${fmtMoney(lent)}${suffix}`
+      : `Lent ${loanShortDate(lentOn)}${suffix}`;
+
+  const detail = isOpen ? `
+    <div class="loan-detail" data-stop="1">
+      ${renderLoanTxns(person)}
+      ${settled ? "" : `
+        <div class="repay-form">
+          <input class="repay-amount" type="text" inputmode="decimal" placeholder="Amount" autocomplete="off" />
+          <input class="repay-date" type="date" value="${todayYMD()}" />
+          <button class="repay-btn" data-action="repay" disabled>Repaid</button>
+          <div class="repay-hint">Up to ${fmtMoney(left)}</div>
+        </div>`}
+      <div class="loan-person-actions">
+        <button class="loan-delete-person" data-action="del-person">Delete ${escapeHtml(person.name)}</button>
+      </div>
+    </div>` : "";
+
+  return `
+    <div class="loan-person ${settled ? "settled" : ""} ${isOpen ? "expanded" : ""}" data-person="${person.id}">
+      <div class="loan-person-head">
+        <div class="loan-person-name">${escapeHtml(person.name)}</div>
+        <div class="loan-person-amount">${settled ? "Settled" : fmtMoney(left)}</div>
+      </div>
+      <div class="loan-person-sub">${sub}</div>
+      ${settled || repaid === 0 ? "" : `<div class="loan-bar"><div class="loan-bar-fill" style="width:${pct}%"></div></div>`}
+      ${detail}
+    </div>`;
+}
+
+function setAppMode(mode) {
+  appMode = mode;
+  const inLoans = mode === "loans";
+
+  document.querySelector(".month-nav").hidden = inLoans;
+  document.querySelector(".app > .hero").hidden = inLoans;
+  document.getElementById("add-card").hidden = inLoans;
+  document.querySelector(".tabs").hidden = inLoans;
+  document.getElementById("view-recent").hidden = inLoans || activeView !== "recent";
+  document.getElementById("view-categories").hidden = inLoans || activeView !== "categories";
+  document.getElementById("loans-screen").hidden = !inLoans;
+
+  const toggle = document.getElementById("mode-toggle");
+  toggle.textContent = inLoans ? "← Ledger" : "Loans";
+
+  if (inLoans) {
+    document.getElementById("reminder-stack").hidden = true;
+    renderLoans();
+  } else {
+    renderReminderBanner();
+  }
+}
+
+function renderLoans() {
+  const total = loanTotalOutstanding(loans);
+  const open = loans.filter(p => !loanIsSettled(p));
+  const settled = loans.filter(p => loanIsSettled(p));
+
+  document.getElementById("loan-total").textContent = formatNumber(total);
+  document.getElementById("loan-meta").textContent = open.length === 0
+    ? "No open loans"
+    : `${open.length} ${open.length === 1 ? "person owes" : "people owe"} you`;
+
+  document.getElementById("loan-names").innerHTML =
+    loans.map(p => `<option value="${escapeHtml(p.name)}"></option>`).join("");
+
+  const root = document.getElementById("loans-list");
+
+  const openHtml = open.length > 0
+    ? loanSortPeople(open).map(p => renderLoanPerson(p, false)).join("")
+    : `<div class="empty">
+         <div class="empty-mark">⁂</div>
+         <div class="empty-text">${settled.length > 0
+           ? "Nothing outstanding. Everyone has paid you back."
+           : "No loans yet. Record one above when you lend to someone."}</div>
+       </div>`;
+
+  const settledHtml = settled.length > 0 ? `
+    <button class="settled-toggle" id="settled-toggle" aria-expanded="${showSettled}">
+      <span>Settled (${settled.length})</span>
+      <span class="settled-caret">⌄</span>
+    </button>
+    ${showSettled ? loanSortPeople(settled).map(p => renderLoanPerson(p, true)).join("") : ""}` : "";
+
+  root.innerHTML = openHtml + settledHtml;
+
+  const settledToggle = document.getElementById("settled-toggle");
+  if (settledToggle) {
+    settledToggle.addEventListener("click", () => {
+      showSettled = !showSettled;
+      renderLoans();
+    });
+  }
+
+  root.querySelectorAll(".loan-person").forEach(el => {
+    const personId = el.dataset.person;
+
+    el.addEventListener("click", (ev) => {
+      const action = ev.target.dataset.action;
+      if (action === "del-txn") { deleteLoanTxn(personId, ev.target.dataset.txn); return; }
+      if (action === "del-person") { deleteLoanPerson(personId); return; }
+      if (action === "repay") return;               // handled by its own listener
+      if (ev.target.closest("[data-stop]")) return; // clicks inside the panel don't collapse it
+      expandedPersonId = (expandedPersonId === personId) ? null : personId;
+      renderLoans();
+    });
+
+    const amountEl = el.querySelector(".repay-amount");
+    if (!amountEl) return;
+
+    const person = loans.find(p => p.id === personId);
+    const btn = el.querySelector(".repay-btn");
+    const hint = el.querySelector(".repay-hint");
+    const max = Math.max(0, loanOutstanding(person));
+
+    amountEl.addEventListener("input", () => {
+      const cleaned = amountEl.value.replace(/[^0-9.]/g, "");
+      if (cleaned !== amountEl.value) amountEl.value = cleaned;
+      const n = parseFloat(cleaned);
+      const over = n > max;
+      btn.disabled = !(n > 0);
+      hint.classList.toggle("over", over);
+      hint.textContent = over
+        ? `That's more than owed — will record ${fmtMoney(max)}`
+        : `Up to ${fmtMoney(max)}`;
+    });
+
+    btn.addEventListener("click", () => {
+      const n = parseFloat(amountEl.value);
+      if (!(n > 0)) return;
+      const date = el.querySelector(".repay-date").value || todayYMD();
+      addRepayment(personId, n, date);
+    });
+  });
+}
+
+/* ───────────────────────────────────────────────────────────
+   Loans — mutations. Each one saves, marks the sync dirty and
+   re-renders, mirroring the entry mutations above.
+   ─────────────────────────────────────────────────────────── */
+async function saveLoansAndRender(message) {
+  await store.saveLoans(loans);
+  markDirty();
+  renderLoans();
+  if (message) toast(message);
+}
+
+async function addLoan(name, amount, reason, date) {
+  const trimmed = String(name || "").trim();
+  if (!trimmed || !(amount > 0)) return;
+
+  const txn = {
+    id: uid(),
+    type: "lend",
+    amount,
+    reason: String(reason || "").trim(),
+    date,
+    createdAt: Date.now()
+  };
+
+  const existing = loanFindByName(loans, trimmed);
+  if (existing) {
+    existing.txns.push(txn);
+  } else {
+    loans.push({ id: uid(), name: trimmed, createdAt: Date.now(), txns: [txn] });
+  }
+  await saveLoansAndRender(existing ? `Added to ${existing.name}` : `Loan to ${trimmed} recorded`);
+}
+
+async function addRepayment(personId, amount, date) {
+  const person = loans.find(p => p.id === personId);
+  if (!person) return;
+
+  const capped = loanCapRepayment(person, amount);
+  if (!(capped > 0)) return;
+
+  person.txns.push({
+    id: uid(),
+    type: "repay",
+    amount: capped,
+    reason: "",
+    date,
+    createdAt: Date.now()
+  });
+
+  const settled = loanIsSettled(person);
+  await saveLoansAndRender(settled ? `${person.name} is all square` : `${fmtMoney(capped)} from ${person.name}`);
+}
+
+async function deleteLoanTxn(personId, txnId) {
+  const person = loans.find(p => p.id === personId);
+  if (!person) return;
+
+  const updated = loanWithoutTxn(person, txnId);
+  if (updated === null) {
+    loans = loans.filter(p => p.id !== personId);
+    if (expandedPersonId === personId) expandedPersonId = null;
+    await saveLoansAndRender(`${person.name} removed`);
+    return;
+  }
+  person.txns = updated.txns;
+  await saveLoansAndRender("Removed");
+}
+
+async function deleteLoanPerson(personId) {
+  const person = loans.find(p => p.id === personId);
+  if (!person) return;
+  if (!confirm(`Delete ${person.name} and their whole loan history?`)) return;
+
+  loans = loans.filter(p => p.id !== personId);
+  if (expandedPersonId === personId) expandedPersonId = null;
+  await saveLoansAndRender(`${person.name} removed`);
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -2769,11 +3374,14 @@ async function applyBackupPayload(d) {
   }
   ensureSubArrays();
   budgets = (d.budgets && typeof d.budgets === "object") ? d.budgets : {};
+  loans = normalizeLoans(d.loans, todayYMD(), uid);
 
   selectedCat = categories[0].id;
   selectedSub = null;
+  expandedPersonId = null;
 
   await store.saveEntries(entries);
+  await store.saveLoans(loans);
   await persistSettings();
   renderChips();
   renderAll();
@@ -2913,9 +3521,9 @@ function markDirty() {
 function buildBackupPayload() {
   return {
     app: "Ledger",
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
-    data: { entries, categories, budgets }
+    data: { entries, categories, budgets, loans }
   };
 }
 
@@ -3128,6 +3736,7 @@ function renderAll() {
   renderHero();
   renderRecent();
   renderCategoriesView();
+  renderLoans();
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -3169,6 +3778,47 @@ function wire() {
   });
 
   document.getElementById("cancel-edit").addEventListener("click", cancelEditMode);
+
+  // Loans
+  document.getElementById("loan-date").value = todayYMD();
+
+  const loanAmountEl = document.getElementById("loan-amount");
+  const loanNameEl = document.getElementById("loan-name");
+  const loanSaveBtn = document.getElementById("loan-save");
+
+  const syncLoanSaveBtn = () => {
+    const n = parseFloat(loanAmountEl.value);
+    loanSaveBtn.disabled = !(n > 0 && loanNameEl.value.trim());
+  };
+
+  loanAmountEl.addEventListener("input", () => {
+    const cleaned = loanAmountEl.value.replace(/[^0-9.]/g, "");
+    if (cleaned !== loanAmountEl.value) loanAmountEl.value = cleaned;
+    syncLoanSaveBtn();
+  });
+  loanNameEl.addEventListener("input", syncLoanSaveBtn);
+
+  loanSaveBtn.addEventListener("click", async () => {
+    const amount = parseFloat(loanAmountEl.value);
+    const name = loanNameEl.value.trim();
+    if (!(amount > 0) || !name) return;
+
+    const reason = document.getElementById("loan-reason").value;
+    const date = document.getElementById("loan-date").value || todayYMD();
+
+    await addLoan(name, amount, reason, date);
+
+    loanAmountEl.value = "";
+    loanNameEl.value = "";
+    document.getElementById("loan-reason").value = "";
+    document.getElementById("loan-date").value = todayYMD();
+    loanSaveBtn.disabled = true;
+    loanAmountEl.blur();
+  });
+
+  document.getElementById("mode-toggle").addEventListener("click", () => {
+    setAppMode(appMode === "loans" ? "ledger" : "loans");
+  });
 
   // Tabs
   document.querySelectorAll(".tab").forEach(t => {
@@ -3386,6 +4036,7 @@ function closeCatSheet() {
   const settings = await store.loadSettings();
   const cloud = await store.loadCloud();
   dismissedReminders = (await store.loadDismissedReminders()) || {};
+  loans = normalizeLoans(await store.loadLoans(), todayYMD(), uid);
 
   if (settings && Array.isArray(settings.categories) && settings.categories.length > 0) {
     categories = settings.categories;
